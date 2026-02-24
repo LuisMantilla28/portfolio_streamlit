@@ -3,7 +3,7 @@ import navigation
 # -----------------------------
 # Configuración general
 # -----------------------------
-navigation.show()
+
 
 st.set_page_config(
     page_title="Luis Mantilla | Quant & Data Science Portfolio",
@@ -11,6 +11,16 @@ st.set_page_config(
     layout="wide",
 )
 
+hide_streamlit_style = """
+<style>
+[data-testid="stSidebarNav"] {display: none;}
+header {visibility: hidden;}
+</style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+
+navigation.show()
 
 
 # -----------------------------
