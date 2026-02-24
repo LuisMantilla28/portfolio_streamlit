@@ -34,7 +34,6 @@ def badge(text: str):
 # -----------------------------
 with st.sidebar:
     st.title("📌 Navegación")
-    st.caption("Portafolio (base) — Streamlit + GitHub")
 
     st.markdown("---")
     st.markdown("### Secciones")
