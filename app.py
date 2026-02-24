@@ -39,7 +39,7 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### Secciones")
     st.markdown("- 🏠 Inicio")
-    st.markdown("- 🟦 SQL (Riesgo)")
+    st.markdown("- 🟦 SQL")
     st.markdown("- 📈 Series de tiempo")
     st.markdown("- 💰 Modelado financiero")
     st.markdown("- 🤖 Machine Learning")
@@ -59,21 +59,15 @@ col1, col2 = st.columns([2, 1], gap="large")
 
 with col1:
     st.title("Luis Mantilla")
-    st.subheader("Quant / Data Science — Riesgo financiero, estadística y modelado")
+    st.subheader("Data Science — Riesgo financiero")
     st.write(
         """
-        Portafolio orientado a **banca y riesgo (A)**, **data science (B)** y **cuant/finanzas (C)**.
+        Portafolio orientado a **banca y riesgo**, **data science** y **cuant/finanzas**.
         Aquí encontrarás proyectos con enfoque en **SQL analytics**, **series de tiempo**, **modelado financiero** y **ML aplicado**.
         """
     )
 
-    cta1, cta2, cta3 = st.columns(3)
-    with cta1:
-        st.link_button("📊 Ver proyectos SQL", "https://github.com/tu_usuario")
-    with cta2:
-        st.link_button("📈 Ver series de tiempo", "https://github.com/tu_usuario")
-    with cta3:
-        st.link_button("💰 Ver modelado financiero", "https://github.com/tu_usuario")
+
 
 with col2:
     st.markdown("### Perfil")
@@ -84,7 +78,7 @@ with col2:
         st.info("Tip: agrega una foto en `assets/profile.png` (opcional).")
 
     st.markdown("### Contacto")
-    st.write("- 📧 correo: tu_correo@correo.com")
+    st.write("- 📧 correo: luisenriquemantillasanabria@gmail.com")
     st.write("- 🌎 Bogotá, Colombia")
 
 st.markdown("---")
