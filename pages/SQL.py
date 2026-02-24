@@ -1,6 +1,7 @@
 import streamlit as st
+import navigation
 
-
+navigation.show()
 
 st.title("SQL Projects")
 st.subheader("Data analysis, querying and database modeling")
