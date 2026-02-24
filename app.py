@@ -3,13 +3,15 @@ import navigation
 # -----------------------------
 # Configuración general
 # -----------------------------
+navigation.show()
+
 st.set_page_config(
     page_title="Luis Mantilla | Quant & Data Science Portfolio",
     page_icon="📈",
     layout="wide",
 )
 
-navigation.show()
+
 
 # -----------------------------
 # Helpers
