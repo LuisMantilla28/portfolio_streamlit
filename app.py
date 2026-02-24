@@ -9,14 +9,7 @@ st.set_page_config(
     layout="wide",
 )
 
-# Ocultar menú nativo de Streamlit
-hide_streamlit_style = """
-<style>
-[data-testid="stSidebarNav"] {display: none;}
-header {visibility: hidden;}
-</style>
-"""
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+navigation.show()
 
 # -----------------------------
 # Helpers
