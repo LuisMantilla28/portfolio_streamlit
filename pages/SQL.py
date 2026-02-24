@@ -34,7 +34,7 @@ st.image(
 )
 
 st.caption(
-    "Esquema relacional del modelo. Las flechas representan relaciones por llave foránea."
+    "Esquema relacional del modelo. Las flechas representan relaciones por llave foránea (la linea continua significa que la llave clave hija depende de la tabla padre)."
 )
 
 st.markdown("---")
