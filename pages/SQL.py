@@ -26,6 +26,19 @@ El modelo sigue una estructura relacional típica de sistemas financieros reales
 
 st.markdown("---")
 
+st.subheader("Modelo relacional del dataset")
+
+st.image(
+    "assets/diagrma_sql_portafolio.png",
+    use_container_width=True,
+)
+
+st.caption(
+    "Esquema relacional del modelo. Las flechas representan relaciones por llave foránea."
+)
+
+st.markdown("---")
+
 # ============================================================
 # Customers
 # ============================================================
