@@ -37,12 +37,25 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("### Secciones")
-    st.markdown("- 🏠 Inicio")
-    st.markdown("- 🟦 SQL")
-    st.markdown("- 📈 Series de tiempo")
-    st.markdown("- 💰 Modelado financiero")
-    st.markdown("- 🤖 Machine Learning")
-    st.markdown("- 🧾 CV")
+    
+
+if st.button("🏠 Inicio"):
+    st.switch_page("app.py")
+
+if st.button("🟦 SQL"):
+    st.switch_page("pages/SQL.py")
+
+if st.button("📈 Series de tiempo"):
+    st.write("Próximamente")
+
+if st.button("💰 Modelado financiero"):
+    st.write("Próximamente")
+
+if st.button("🤖 Machine Learning"):
+    st.write("Próximamente")
+
+if st.button("🧾 CV"):
+    st.write("Próximamente")
 
     st.markdown("---")
     st.markdown("### Enlaces")
