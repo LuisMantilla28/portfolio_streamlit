@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.set_page_config(page_title="SQL | Portfolio", layout="wide")
+
 
 st.title("SQL Projects")
 st.subheader("Data analysis, querying and database modeling")
