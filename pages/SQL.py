@@ -43,20 +43,23 @@ st.markdown("---")
 # Customers
 # ============================================================
 
-st.subheader("1️⃣ Customers (30.000 registros)")
+# ============================================================
+# Customers
+# ============================================================
 
-st.write("Dimensión principal de clientes.")
+st.subheader("1️⃣ Customers (1.000 registros)")
+st.write("Dimensión principal de clientes (información demográfica y financiera básica).")
 
 st.markdown("""
 **Columnas:**
 
-- `customer_id` → Identificador único del cliente.  
-- `segment` → Segmento comercial (Mass, Affluent, SME).  
-- `region` → Región geográfica en Colombia.  
-- `age` → Edad del cliente (18–75 años).  
-- `income_monthly` → Ingreso mensual estimado (distribución lognormal).  
-- `risk_score` → Score crediticio (300–850), correlacionado con ingreso y edad.  
-- `customer_since` → Fecha de vinculación al banco.
+- `customer_id` → Identificador único del cliente (PK).  
+- `segment` → Segmento comercial (p. ej., Mass / Affluent / SME).  
+- `region` → Región geográfica asociada al cliente.  
+- `age` → Edad del cliente.  
+- `income_monthly` → Ingreso mensual estimado (COP).  
+- `risk_score` → Score crediticio (entero), relacionado con el perfil financiero del cliente.  
+- `customer_since` → Fecha de vinculación del cliente.
 """)
 
 st.markdown("---")
@@ -65,18 +68,17 @@ st.markdown("---")
 # Accounts
 # ============================================================
 
-st.subheader("2️⃣ Accounts (40.000 registros)")
-
-st.write("Productos de depósito asociados a clientes.")
+st.subheader("2️⃣ Accounts (1.300 registros)")
+st.write("Productos de depósito asociados a clientes (relación many-to-one con Customers).")
 
 st.markdown("""
 **Columnas:**
 
-- `account_id` → Identificador único de la cuenta.  
-- `customer_id` → Cliente titular de la cuenta.  
-- `account_type` → Tipo de cuenta (Savings / Checking).  
-- `opened_date` → Fecha de apertura.  
-- `status` → Estado de la cuenta (Active, Dormant, Closed).
+- `account_id` → Identificador único de la cuenta (PK).  
+- `customer_id` → Identificador del cliente titular (FK → `customers.customer_id`).  
+- `account_type` → Tipo de cuenta (p. ej., Savings / Checking).  
+- `opened_date` → Fecha de apertura de la cuenta.  
+- `status` → Estado de la cuenta (p. ej., Active / Dormant / Closed).
 """)
 
 st.markdown("---")
@@ -85,28 +87,28 @@ st.markdown("---")
 # Loans
 # ============================================================
 
-st.subheader("3️⃣ Loans (35.000 registros)")
-
-st.write("Cartera de créditos originados entre 2022 y 2025.")
+st.subheader("3️⃣ Loans (1.100 registros)")
+st.write("Cartera de créditos originados (relación many-to-one con Customers).")
 
 st.markdown("""
 **Columnas:**
 
-- `loan_id` → Identificador único del crédito.  
-- `customer_id` → Cliente asociado al préstamo.  
-- `product` → Tipo de producto (Consumo, Libranza, Hipotecario, Vehículo, Tarjeta).  
-- `origination_date` → Fecha de desembolso.  
-- `amount` → Monto desembolsado (colas pesadas por tipo de producto).  
-- `term_months` → Plazo contractual del crédito.  
-- `interest_rate` → Tasa de interés anual, dependiente del producto y del score.  
-- `pd_latent` → Probabilidad de incumplimiento latente (simulada).  
-- `segment` → Segmento del cliente al momento de originación.  
-- `risk_score` → Score del cliente al originar el crédito.  
-- `income_monthly` → Ingreso mensual del cliente.
+- `loan_id` → Identificador único del crédito (PK).  
+- `customer_id` → Cliente asociado al préstamo (FK → `customers.customer_id`).  
+- `product` → Tipo de producto (p. ej., Consumo, Libranza, Hipotecario, Vehículo, Tarjeta).  
+- `origination_date` → Fecha de originación/desembolso del crédito.  
+- `amount` → Monto desembolsado (COP).  
+- `term_months` → Plazo del crédito en meses.  
+- `interest_rate` → Tasa de interés anual (double).  
+- `pd_latent` → Probabilidad de incumplimiento latente (double), usada para simular mora.  
+- `segment` → Segmento del cliente (copiado desde Customers para consultas rápidas).  
+- `risk_score` → Score del cliente (copiado desde Customers para consultas rápidas).  
+- `income_monthly` → Ingreso mensual del cliente (copiado desde Customers para consultas rápidas).
 """)
 
 st.markdown("""
-La tasa de interés aumenta cuando el score es bajo, replicando la lógica de pricing por riesgo.
+Nota: `segment`, `risk_score` e `income_monthly` aparecen también en Loans para facilitar análisis sin joins,
+aunque la fuente original de esas variables es Customers.
 """)
 
 st.markdown("---")
@@ -115,27 +117,26 @@ st.markdown("---")
 # Payments
 # ============================================================
 
-st.subheader("4️⃣ Payments (~840.000 registros)")
-
-st.write("Calendario de cuotas generado por préstamo (hasta 24 cuotas por crédito).")
+st.subheader("4️⃣ Payments (13.200 registros)")
+st.write("Calendario de cuotas por préstamo (≈ 12 cuotas por crédito).")
 
 st.markdown("""
 **Columnas:**
 
-- `payment_id` → Identificador único de la cuota.  
-- `loan_id` → Crédito asociado.  
-- `customer_id` → Cliente asociado.  
-- `installment_n` → Número de cuota.  
+- `payment_id` → Identificador único de la cuota (PK).  
+- `loan_id` → Crédito asociado a la cuota (FK → `loans.loan_id`).  
+- `customer_id` → Cliente asociado (FK → `customers.customer_id`).  
+- `origination_date` → Fecha de originación del crédito (copiada para facilitar análisis temporal).  
+- `amount` → Monto del crédito (copiado para facilitar análisis).  
+- `interest_rate` → Tasa anual del crédito (copiada para facilitar análisis).  
+- `pd_latent` → PD latente del crédito (copiada para facilitar análisis).  
+- `installment_n` → Número de cuota (1, 2, 3, …).  
 - `due_date` → Fecha de vencimiento.  
-- `amount_due` → Valor esperado de la cuota.  
+- `amount_due` → Valor esperado de la cuota (COP).  
 - `paid_flag` → Indicador binario (1 = pagada, 0 = no pagada).  
-- `days_late` → Días de atraso.  
-- `paid_date` → Fecha efectiva de pago (si aplica).  
-- `paid_amount` → Monto efectivamente pagado.
-""")
-
-st.markdown("""
-El atraso se simula en función de la PD latente del crédito.
+- `days_late` → Días de atraso (0 si pagó a tiempo).  
+- `paid_date` → Fecha efectiva de pago (NULL si no pagó).  
+- `paid_amount` → Monto pagado (0 si no pagó).
 """)
 
 st.markdown("---")
@@ -144,26 +145,21 @@ st.markdown("---")
 # Delinquency
 # ============================================================
 
-st.subheader("5️⃣ Delinquency (~840.000 registros)")
-
-st.write("Clasificación regulatoria de mora por cuota.")
+st.subheader("5️⃣ Delinquency (13.200 registros)")
+st.write("Clasificación de mora por cuota (bucketización basada en días de mora).")
 
 st.markdown("""
 **Columnas:**
 
-- `loan_id` → Crédito asociado.  
-- `customer_id` → Cliente asociado.  
-- `installment_n` → Número de cuota.  
+- `loan_id` → Crédito asociado (FK → `loans.loan_id`).  
+- `customer_id` → Cliente asociado (FK → `customers.customer_id`).  
+- `installment_n` → Número de cuota (parte de la PK compuesta).  
 - `due_date` → Fecha de vencimiento.  
 - `paid_date` → Fecha de pago (si aplica).  
-- `days_past_due` → Días efectivos de mora.  
-- `delinquency_status` → Bucket regulatorio:
-  - Current  
-  - 1–29  
-  - 30–59  
-  - 60–89  
-  - 90+  
-  - Unpaid
+- `days_past_due` → Días de mora (DPD).  
+- `delinquency_status` → Bucket de mora (p. ej., Current, 1–29, 30–59, 60–89, 90+, Unpaid).  
+
+**Llave primaria:** (`loan_id`, `installment_n`)
 """)
 
 st.markdown("---")
@@ -172,30 +168,24 @@ st.markdown("---")
 # Transactions
 # ============================================================
 
-st.subheader("6️⃣ Transactions (450.000 registros)")
-
-st.write("Actividad transaccional de clientes entre 2022 y 2025.")
+st.subheader("6️⃣ Transactions (10.000 registros)")
+st.write("Actividad transaccional de clientes (movimientos de gasto/ingreso).")
 
 st.markdown("""
 **Columnas:**
 
-- `tx_id` → Identificador único de la transacción.  
+- `tx_id` → Identificador único de la transacción (PK).  
 - `tx_date` → Fecha de la transacción.  
-- `customer_id` → Cliente asociado.  
-- `tx_type` → Tipo de transacción (POS, Transfer, ATM, Online, BillPay).  
-- `amount` → Monto transaccionado.
-""")
-
-st.markdown("""
-La distribución de montos reproduce comportamiento realista:
-muchas transacciones pequeñas y pocas de alto valor.
+- `customer_id` → Cliente asociado (FK → `customers.customer_id`).  
+- `tx_type` → Tipo de transacción (p. ej., POS, Transfer, ATM, Online, BillPay).  
+- `amount` → Monto transaccionado (COP).
 """)
 
 st.markdown("---")
 
 st.success("""
-El volumen del dataset permite ejecutar joins complejos, agregaciones pesadas,
-análisis temporal y métricas avanzadas de cartera usando SQL.
+El tamaño del dataset permite practicar consultas SQL reales: joins multi-tabla, agregaciones, ventanas,
+análisis temporal y construcción de métricas a nivel cliente, crédito y cuota.
 """)
 
 # ============================================================
