@@ -113,12 +113,7 @@ with col2:
 - `term_months` → Plazo en meses.  
 - `interest_rate` → Tasa anual.  
 - `pd_latent` → Probabilidad de incumplimiento.  
-- `segment` → Segmento del cliente.  
-- `risk_score` → Score del cliente.  
-- `income_monthly` → Ingreso mensual.
     """)
-
-st.markdown("Nota: Algunas variables se replican desde Customers para facilitar consultas analíticas.")
 
 st.markdown("---")
 
