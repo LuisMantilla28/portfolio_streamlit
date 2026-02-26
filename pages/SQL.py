@@ -130,17 +130,13 @@ with col1:
     st.markdown("""
 - `payment_id` → Identificador único (PK).  
 - `loan_id` → FK hacia Loans.  
-- `customer_id` → FK hacia Customers.  
-- `origination_date` → Fecha de originación.  
-- `amount` → Monto del crédito.  
-- `interest_rate` → Tasa anual.
+- `customer_id` → FK hacia Customers. 
+- `installment_n` → Número de cuota.  
+- `due_date` → Fecha de vencimiento.  
     """)
 
 with col2:
-    st.markdown("""
-- `pd_latent` → PD latente.  
-- `installment_n` → Número de cuota.  
-- `due_date` → Fecha de vencimiento.  
+    st.markdown(""" 
 - `amount_due` → Valor esperado.  
 - `paid_flag` → Indicador de pago.  
 - `days_late` → Días de atraso.  
@@ -164,11 +160,11 @@ with col1:
 - `loan_id` → FK hacia Loans.  
 - `customer_id` → FK hacia Customers.  
 - `installment_n` → Número de cuota.
+- `due_date` → Fecha de vencimiento.  
     """)
 
 with col2:
     st.markdown("""
-- `due_date` → Fecha de vencimiento.  
 - `paid_date` → Fecha de pago.  
 - `days_past_due` → Días de mora.  
 - `delinquency_status` → Bucket regulatorio.
