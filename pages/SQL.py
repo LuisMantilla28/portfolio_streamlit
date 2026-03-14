@@ -5,7 +5,6 @@ navigation.show()
 
 st.title("SQL 🛢")
 layout="wide"
-st.caption("Relational data modeling and analytical SQL exploration")
 
 st.markdown("---")
 
@@ -16,9 +15,7 @@ st.markdown("---")
 st.header("1. Contextualización de los datos")
 
 st.write("""
-El análisis se desarrolla sobre un **dataset bancario sintético (2022–2025)** diseñado para simular el funcionamiento integral de una cartera de crédito y su actividad transaccional.
-
-No se trata de datos aleatorios: las variables están estructuradas bajo una lógica económica coherente:
+El análisis se desarrolla sobre un **dataset bancario sintético (2022–2025)** diseñado para simular el funcionamiento integral de una cartera de crédito y su actividad transaccional. No se trata de datos aleatorios: las variables están estructuradas bajo una lógica económica coherente:
 
 **Ingreso → Score → Tasa → Probabilidad de Incumplimiento (PD) → Mora**
 
