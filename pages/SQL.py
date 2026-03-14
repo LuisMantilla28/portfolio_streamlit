@@ -1,6 +1,12 @@
 import streamlit as st
 import navigation
+import duckdb
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
+import streamlit as st
 
+DB_PATH="data/banking_risk.duckdb"
 navigation.show()
 
 st.title("SQL 🛢")
@@ -36,6 +42,8 @@ st.caption(
 
 st.markdown("---")
 
+
+
 # ============================================================
 # 2. Preguntas de interés
 # ============================================================
@@ -50,16 +58,72 @@ Las siguientes preguntas guían el análisis y están diseñadas para demostraci
 )
 
 st.markdown("### 2.1 ¿Cómo evoluciona la mora a lo largo de las cuotas?")
-st.markdown("""
-**🎯 Pregunta**  
-¿La probabilidad de atraso aumenta o disminuye conforme avanza el número de cuota (`installment_n`)?  
+st.write("""
+Analizamos cómo cambia la mora a medida que avanza el número de cuota.
+En particular, se calcula la **proporción de cuotas con atraso** (`days_late > 0`)
+y el **promedio de días de mora** por número de cuota.
 """)
 
-st.code("""select installment_n, 
-	avg(days_late)  as promedio_dias_mora , 
-	avg(case when days_late > 0 then 1 else 0 end )  as proporcion_mora  from payments
+# ------------------------------------------------
+# Consulta SQL
+# ------------------------------------------------
+q = """
+select 
+    installment_n, 
+    avg(days_late) as promedio_dias_mora, 
+    avg(case when days_late > 0 then 1 else 0 end) as proporcion_mora
+from payments
 group by installment_n
-order by installment_n  asc;""", language="sql")
+order by installment_n asc;
+"""
+
+with st.expander("Ver consulta SQL"):
+    st.code(q, language="sql")
+
+# ------------------------------------------------
+# Ejecutar consulta
+# ------------------------------------------------
+con = duckdb.connect(DB_PATH)
+df_mora = con.execute(q).df()
+con.close()
+
+# ------------------------------------------------
+# Tabla de resultados (desplegable)
+# ------------------------------------------------
+with st.expander("Ver tabla de resultados"):
+    st.dataframe(df_mora, use_container_width=True)
+
+# ------------------------------------------------
+# Gráfica
+# ------------------------------------------------
+x = df_mora["installment_n"].to_numpy()
+y = df_mora["proporcion_mora"].to_numpy()
+
+fig_mora_cuota, ax = plt.subplots(figsize=(10, 5), dpi=130)
+
+ax.plot(x, y, marker="o", linewidth=2, markersize=5)
+ax.set_title("Proporción de mora por cuota", pad=12)
+ax.set_xlabel("Número de cuota")
+ax.set_ylabel("Proporción en mora")
+
+ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0))
+ax.grid(True, which="major", alpha=0.25)
+
+ax.set_xlim(x.min(), x.max())
+ax.set_ylim(0, min(1, y.max() * 1.15))
+
+plt.tight_layout()
+
+st.markdown("### Visualización")
+st.pyplot(fig_mora_cuota, use_container_width=True)
+
+st.write("""
+**Lectura inicial:** la proporción de mora muestra variaciones moderadas entre cuotas,
+con niveles relativamente estables alrededor del 12%–15%, y un ligero aumento hacia
+las cuotas intermedias.
+""")
+
+
 
 st.markdown("### 2.2 ¿Qué segmento tiene mayor riesgo observado vs riesgo asignado?")
 st.markdown("""
