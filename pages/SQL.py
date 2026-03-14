@@ -8,9 +8,17 @@ import streamlit as st
 
 DB_PATH="data/banking_risk.duckdb"
 navigation.show()
-
-st.title("SQL 🛢")
 layout="wide"
+
+st.title("SQL Analytics 🛢")
+st.markdown("""
+Esta sección presenta una serie de **análisis exploratorios realizados en SQL** sobre un dataset bancario sintético que simula el funcionamiento de una cartera de crédito real.
+
+El objetivo es demostrar el uso de **consultas analíticas**, incluyendo **joins multi-tabla, agregaciones, construcción de métricas de riesgo y análisis de comportamiento financiero**.  
+Cada ejemplo parte de una **pregunta de negocio**, muestra la **consulta SQL utilizada** y presenta los **resultados mediante tablas y visualizaciones**.
+
+Las consultas están diseñadas para reflejar escenarios comunes en **analytics bancario y riesgo crediticio**, como el análisis de mora, segmentación de clientes y relación entre comportamiento financiero y riesgo.
+""")
 
 st.markdown("---")
 
@@ -395,9 +403,8 @@ Esto sugiere que, en este dataset sintético, **no se observa una relación fuer
 En conjunto, los resultados muestran que las diferencias en riesgo por tipo de cuenta existen, pero son moderadas, y no parecen explicarse únicamente por el volumen promedio de transacciones.
 """)
 
-
-
-
+st.markdown("---")
+st.header("3. Explicación de las tablas de la base de datos")
 # ============================================================
 # Customers
 # ============================================================
@@ -422,7 +429,6 @@ with col2:
 - `customer_since` → Fecha de vinculación.
     """)
 
-st.markdown("---")
 
 # ============================================================
 # Accounts
@@ -446,7 +452,7 @@ with col2:
 - `status` → Estado de la cuenta.
     """)
 
-st.markdown("---")
+
 
 
 
@@ -476,7 +482,7 @@ with col2:
 - `pd_latent` → Probabilidad de incumplimiento.  
     """)
 
-st.markdown("---")
+
 
 # ============================================================
 # Payments
@@ -505,7 +511,7 @@ with col2:
 - `paid_amount` → Monto pagado.
     """)
 
-st.markdown("---")
+
 
 # ============================================================
 # Delinquency
@@ -533,7 +539,6 @@ with col2:
 
 st.markdown("**Llave primaria:** (`loan_id`, `installment_n`)")
 
-st.markdown("---")
 
 # ============================================================
 # Transactions
@@ -556,15 +561,10 @@ with col2:
 - `tx_type` → Tipo de transacción.  
 - `amount` → Monto transaccionado.
     """)
-st.markdown("---")
 
-st.success("""
-El tamaño del dataset permite practicar consultas SQL reales: joins multi-tabla, agregaciones, ventanas,
-análisis temporal y construcción de métricas a nivel cliente, crédito y cuota.
-""")
 
-# ============================================================
-# Secciones siguientes (placeholders)
-# ============================================================
+
+
+
 
 
