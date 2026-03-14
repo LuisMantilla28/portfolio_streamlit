@@ -4,6 +4,7 @@ import navigation
 navigation.show()
 
 st.title("SQL 🛢")
+layout="wide"
 st.caption("Relational data modeling and analytical SQL exploration")
 
 st.markdown("---")
