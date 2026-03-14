@@ -75,9 +75,8 @@ from payments
 group by installment_n
 order by installment_n asc;
 """
+st.code(q_segmento, language="sql")
 
-with st.expander("Ver consulta SQL"):
-    st.code(q, language="sql")
 
 # ------------------------------------------------
 # Ejecutar consulta
