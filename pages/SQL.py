@@ -3,7 +3,7 @@ import navigation
 
 navigation.show()
 
-st.title("SQL")
+st.title("SQL 🛢")
 st.caption("Relational data modeling and analytical SQL exploration")
 
 st.markdown("---")
