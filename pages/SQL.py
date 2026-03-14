@@ -36,6 +36,68 @@ st.caption(
 
 st.markdown("---")
 
+# ============================================================
+# 2. Preguntas de interés
+# ============================================================
+
+st.header("2. Preguntas de interés")
+
+st.write(
+    """
+Las siguientes preguntas guían el análisis y están diseñadas para demostraciones prácticas de:
+**joins multi-tabla**, **agregaciones**, **funciones de ventana**, **análisis temporal** y **métricas comparables**.
+"""
+)
+
+st.markdown("### 2.1 ¿Cómo evoluciona la mora a lo largo de las cuotas?")
+st.markdown("""
+**🎯 Pregunta**  
+¿La probabilidad de atraso aumenta o disminuye conforme avanza el número de cuota (`installment_n`)?  
+""")
+
+st.code("""select installment_n, 
+	avg(days_late)  as promedio_dias_mora , 
+	avg(case when days_late > 0 then 1 else 0 end )  as proporcion_mora  from payments
+group by installment_n
+order by installment_n  asc;""", language="sql")
+
+st.markdown("### 2.2 ¿Qué segmento tiene mayor riesgo observado vs riesgo asignado?")
+st.markdown("""
+**🎯 Pregunta**  
+¿La **PD latente asignada** (`pd_latent`) coincide con la mora observada por `segment`?  
+*(Ejemplo: comparar PD promedio vs tasa real de mora 30+ / 90+ por segmento.)*
+""")
+
+st.markdown("### 2.3 ¿Existe relación entre ingreso y mora?")
+st.markdown("""
+**🎯 Pregunta**  
+¿Los clientes con menor `income_monthly` presentan mayor probabilidad de atraso?  
+*(Ejemplo: mora por deciles de ingreso y/o por rangos de ingreso.)*
+""")
+
+st.markdown("### 2.4 ¿Qué producto es más riesgoso?")
+st.markdown("""
+**🎯 Pregunta**  
+¿Cuál tipo de crédito (`product`) presenta mayor tasa de mora severa (**90+**)?
+*(Ejemplo: ranking de productos por % de cuotas 90+ o por % de créditos con al menos una cuota 90+.)*
+""")
+
+st.markdown("### 2.5 ¿El comportamiento transaccional está asociado a menor riesgo?")
+st.markdown("""
+**🎯 Pregunta**  
+¿Clientes con mayor actividad transaccional (número de transacciones y/o monto total) presentan menor mora?  
+*(Ejemplo: comparar mora entre cuantiles de actividad transaccional.)*
+""")
+
+st.info(
+    "En la siguiente sección se implementarán consultas SQL y gráficas para responder estas preguntas "
+    "con indicadores y visualizaciones claras."
+)
+
+st.markdown("---")
+st.header("3. Consultas y gráficas")
+st.caption("Próximamente")
+
 
 # ============================================================
 # Customers
@@ -86,6 +148,9 @@ with col2:
     """)
 
 st.markdown("---")
+
+
+
 
 # ============================================================
 # Loans
@@ -203,65 +268,4 @@ análisis temporal y construcción de métricas a nivel cliente, crédito y cuot
 # Secciones siguientes (placeholders)
 # ============================================================
 
-# ============================================================
-# 2. Preguntas de interés
-# ============================================================
 
-st.markdown("---")
-st.header("2. Preguntas de interés")
-
-st.write(
-    """
-Las siguientes preguntas guían el análisis y están diseñadas para demostraciones prácticas de:
-**joins multi-tabla**, **agregaciones**, **funciones de ventana**, **análisis temporal** y **métricas comparables**.
-"""
-)
-
-st.markdown("### 2.1 ¿Cómo evoluciona la mora a lo largo de las cuotas?")
-st.markdown("""
-**🎯 Pregunta**  
-¿La probabilidad de atraso aumenta o disminuye conforme avanza el número de cuota (`installment_n`)?  
-""")
-
-st.code("""select installment_n, 
-	avg(days_late)  as promedio_dias_mora , 
-	avg(case when days_late > 0 then 1 else 0 end )  as proporcion_mora  from payments
-group by installment_n
-order by installment_n  asc;""", language="sql")
-
-st.markdown("### 2.2 ¿Qué segmento tiene mayor riesgo observado vs riesgo asignado?")
-st.markdown("""
-**🎯 Pregunta**  
-¿La **PD latente asignada** (`pd_latent`) coincide con la mora observada por `segment`?  
-*(Ejemplo: comparar PD promedio vs tasa real de mora 30+ / 90+ por segmento.)*
-""")
-
-st.markdown("### 2.3 ¿Existe relación entre ingreso y mora?")
-st.markdown("""
-**🎯 Pregunta**  
-¿Los clientes con menor `income_monthly` presentan mayor probabilidad de atraso?  
-*(Ejemplo: mora por deciles de ingreso y/o por rangos de ingreso.)*
-""")
-
-st.markdown("### 2.4 ¿Qué producto es más riesgoso?")
-st.markdown("""
-**🎯 Pregunta**  
-¿Cuál tipo de crédito (`product`) presenta mayor tasa de mora severa (**90+**)?
-*(Ejemplo: ranking de productos por % de cuotas 90+ o por % de créditos con al menos una cuota 90+.)*
-""")
-
-st.markdown("### 2.5 ¿El comportamiento transaccional está asociado a menor riesgo?")
-st.markdown("""
-**🎯 Pregunta**  
-¿Clientes con mayor actividad transaccional (número de transacciones y/o monto total) presentan menor mora?  
-*(Ejemplo: comparar mora entre cuantiles de actividad transaccional.)*
-""")
-
-st.info(
-    "En la siguiente sección se implementarán consultas SQL y gráficas para responder estas preguntas "
-    "con indicadores y visualizaciones claras."
-)
-
-st.markdown("---")
-st.header("3. Consultas y gráficas")
-st.caption("Próximamente")
