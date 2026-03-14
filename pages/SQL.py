@@ -30,7 +30,6 @@ st.subheader("Modelo relacional del dataset")
 
 st.image(
     "assets/diagrma_sql_portafolio.png",
-    use_container_width=True,
 )
 
 st.caption(
