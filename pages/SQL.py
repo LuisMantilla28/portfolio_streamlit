@@ -228,7 +228,7 @@ st.markdown("""
 
 st.code("""select installment_n, 
 	avg(days_late)  as promedio_dias_mora , 
-    avg(case when days_late > 0 then 1 else 0 end )  as proporcion_mora  from payments
+	avg(case when days_late > 0 then 1 else 0 end )  as proporcion_mora  from payments
 group by installment_n
 order by installment_n  asc;""", language="sql")
 
