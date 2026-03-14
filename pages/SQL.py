@@ -210,11 +210,90 @@ with st.expander("Ver resultados"):
 En conjunto, la **PD latente asignada captura razonablemente el orden relativo del riesgo entre segmentos**,
 aunque existen diferencias entre el riesgo teórico y el comportamiento efectivamente observado.
 """)
+    
+# ============================================================
+# 2.3 Relación entre ingreso y mora
+# ============================================================
+
 st.markdown("### 2.3 ¿Existe relación entre ingreso y mora?")
 st.markdown("""
 **🎯 Pregunta**  
 ¿Los clientes con menor `income_monthly` presentan mayor probabilidad de atraso?  
-*(Ejemplo: mora por deciles de ingreso y/o por rangos de ingreso.)*
+*(Ejemplo: mora por rangos de ingreso.)*
+""")
+
+st.markdown("#### Consulta SQL")
+
+q_ingreso_mora = """
+SELECT 
+    CASE 
+        WHEN income_monthly < 2000000 THEN 'Bajo (menor a 2M)'
+        WHEN income_monthly < 10000000 THEN 'Medio (entre 2M y 10M)'
+        ELSE 'Alto (más de 10M)'
+    END AS grupo_ingresos,
+    AVG(CASE WHEN days_late > 0 THEN 1 ELSE 0 END) AS proporcion_retrasos
+FROM customers
+JOIN payments 
+    ON customers.customer_id = payments.customer_id
+GROUP BY grupo_ingresos
+ORDER BY 
+    CASE 
+        WHEN grupo_ingresos = 'Bajo (menor a 2M)' THEN 1
+        WHEN grupo_ingresos = 'Medio (entre 2M y 10M)' THEN 2
+        ELSE 3
+    END;
+"""
+
+st.code(q_ingreso_mora, language="sql")
+
+# ------------------------------------------------
+# Ejecutar consulta
+# ------------------------------------------------
+con = duckdb.connect(DB_PATH)
+df_ingreso_mora = con.execute(q_ingreso_mora).df()
+con.close()
+
+# ------------------------------------------------
+# Resultados contraídos
+# ------------------------------------------------
+with st.expander("Ver resultados"):
+
+    st.markdown("#### Tabla de resultados")
+    st.dataframe(df_ingreso_mora, use_container_width=True)
+
+    # ------------------------------------------------
+    # Gráfica
+    # ------------------------------------------------
+    import matplotlib.pyplot as plt
+    import matplotlib.ticker as mtick
+
+    x = df_ingreso_mora["grupo_ingresos"]
+    y = df_ingreso_mora["proporcion_retrasos"]
+
+    fig_ingreso_mora, ax = plt.subplots(figsize=(8, 5), dpi=130)
+
+    ax.bar(x, y)
+    ax.set_title("Proporción de mora por rango de ingreso", pad=12)
+    ax.set_xlabel("Grupo de ingresos")
+    ax.set_ylabel("Proporción de retrasos")
+    ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0))
+    ax.grid(True, axis="y", alpha=0.25)
+
+    plt.xticks(rotation=10)
+    plt.tight_layout()
+
+    st.markdown("#### Visualización")
+    st.pyplot(fig_ingreso_mora, use_container_width=True)
+
+    st.markdown("""
+**Interpretación inicial**
+
+- Los clientes del grupo **Bajo (menor a 2M)** presentan la mayor proporción de retrasos, con un valor cercano al **14.3%**.  
+- El grupo **Medio (entre 2M y 10M)** muestra una proporción intermedia, alrededor de **13.1%**.  
+- El grupo **Alto (más de 10M)** registra la menor mora observada, con aproximadamente **11.6%**.  
+
+En conjunto, los resultados sugieren una **relación inversa entre ingreso y mora**:
+a mayor ingreso mensual, menor probabilidad de atraso en los pagos.
 """)
 
 st.markdown("### 2.4 ¿Qué producto es más riesgoso?")
