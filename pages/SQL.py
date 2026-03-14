@@ -125,12 +125,90 @@ las cuotas intermedias.
 
 
 
+# ============================================================
+# 2.2 Riesgo observado vs riesgo estimado por segmento
+# ============================================================
+
 st.markdown("### 2.2 ¿Qué segmento tiene mayor riesgo observado vs riesgo asignado?")
+
 st.markdown("""
 **🎯 Pregunta**  
 ¿La **PD latente asignada** (`pd_latent`) coincide con la mora observada por `segment`?  
-*(Ejemplo: comparar PD promedio vs tasa real de mora 30+ / 90+ por segmento.)*
+*(Ejemplo: comparar PD promedio vs tasa real de mora observada por segmento.)*
 """)
+
+st.markdown("#### Consulta SQL")
+
+sql_default = """
+SELECT 
+    segment,
+    AVG(pd_latent) AS promedio_estimado,
+    AVG(CASE WHEN days_late > 0 THEN 1 ELSE 0 END) AS prop_retardos
+FROM payments
+LEFT JOIN loans
+    ON payments.loan_id = loans.loan_id
+JOIN customers
+    ON customers.customer_id = payments.customer_id
+GROUP BY segment;
+"""
+
+query = st.text_area(
+    "Puedes modificar la consulta y volver a ejecutarla:",
+    sql_default,
+    height=180
+)
+
+if st.button("Ejecutar consulta"):
+
+    try:
+        con = duckdb.connect(DB_PATH)
+        df_comparacion_mora = con.execute(query).df()
+        con.close()
+
+        with st.expander("Ver resultados"):
+
+            st.markdown("#### Tabla de resultados")
+            st.dataframe(df_comparacion_mora, use_container_width=True)
+
+            # -----------------------
+            # Gráfica
+            # -----------------------
+
+            import matplotlib.pyplot as plt
+            import numpy as np
+
+            segmentos = df_comparacion_mora["segment"]
+            estimado = df_comparacion_mora["promedio_estimado"]
+            observado = df_comparacion_mora["prop_retardos"]
+
+            x = np.arange(len(segmentos))
+            width = 0.35
+
+            fig_segmentos, ax = plt.subplots(figsize=(8,5), dpi=120)
+
+            ax.bar(x - width/2, estimado, width, label="PD estimada")
+            ax.bar(x + width/2, observado, width, label="Mora observada")
+
+            ax.set_xticks(x)
+            ax.set_xticklabels(segmentos)
+            ax.set_ylabel("Probabilidad")
+            ax.set_title("Riesgo estimado vs observado por segmento")
+            ax.legend()
+
+            st.markdown("#### Visualización")
+            st.pyplot(fig_segmentos, use_container_width=True)
+
+            st.markdown("""
+**Interpretación inicial**
+
+- El segmento **Mass** presenta la mayor tasa de mora observada.  
+- El segmento **Affluent** y **SME** muestran niveles de atraso menores.  
+- En general, la **PD latente simulada se aproxima razonablemente al comportamiento observado**, aunque existen pequeñas diferencias que pueden reflejar variabilidad aleatoria o efectos no modelados.
+""")
+
+    except Exception as e:
+        st.error("Error al ejecutar la consulta SQL.")
+        st.text(e)
 
 st.markdown("### 2.3 ¿Existe relación entre ingreso y mora?")
 st.markdown("""
