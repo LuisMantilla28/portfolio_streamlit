@@ -295,28 +295,107 @@ En conjunto, los resultados sugieren una **relación inversa entre ingreso y mor
 a mayor ingreso mensual, menor probabilidad de atraso en los pagos.
 """)
 
-st.markdown("### 2.4 ¿Qué producto es más riesgoso?")
+# ============================================================
+# 2.4 Actividad financiera, tipo de cuenta y riesgo
+# ============================================================
+
+st.markdown("### 2.4 ¿La actividad financiera del cliente está asociada al riesgo de mora?")
 st.markdown("""
 **🎯 Pregunta**  
-¿Cuál tipo de crédito (`product`) presenta mayor tasa de mora severa (**90+**)?
-*(Ejemplo: ranking de productos por % de cuotas 90+ o por % de créditos con al menos una cuota 90+.)*
+¿Los clientes con mayor actividad transaccional o con múltiples tipos de cuenta presentan menor probabilidad de atraso en sus pagos?
 """)
 
-st.markdown("### 2.5 ¿El comportamiento transaccional está asociado a menor riesgo?")
-st.markdown("""
-**🎯 Pregunta**  
-¿Clientes con mayor actividad transaccional (número de transacciones y/o monto total) presentan menor mora?  
-*(Ejemplo: comparar mora entre cuantiles de actividad transaccional.)*
-""")
+st.markdown("#### Consulta SQL")
 
-st.info(
-    "En la siguiente sección se implementarán consultas SQL y gráficas para responder estas preguntas "
-    "con indicadores y visualizaciones claras."
+q_actividad_riesgo = """
+WITH info_tran_usuario AS (
+  SELECT 
+    t.customer_id,
+    COUNT(*) AS numero_transacciones,
+    AVG(t.amount) AS promedio_monto
+  FROM transactions t
+  GROUP BY t.customer_id
+),
+tipo_cuenta AS (
+  SELECT
+    a.customer_id,
+    CASE
+      WHEN SUM(a.account_type = 'Savings') > 0 AND SUM(a.account_type = 'Checking') > 0 THEN 'Both'
+      WHEN SUM(a.account_type = 'Savings') > 0 THEN 'Savings'
+      WHEN SUM(a.account_type = 'Checking') > 0 THEN 'Checking'
+      ELSE 'Unknown'
+    END AS account_type
+  FROM accounts a
+  GROUP BY a.customer_id
 )
+SELECT 
+  tc.account_type,
+  AVG(it.numero_transacciones) AS promedio_transacciones,
+  AVG(it.promedio_monto) AS promedio_monto,
+  AVG(CASE WHEN p.days_late > 0 THEN 1 ELSE 0 END) AS proporcion_riesgo
+FROM payments p
+JOIN info_tran_usuario it ON p.customer_id = it.customer_id
+JOIN tipo_cuenta tc       ON p.customer_id = tc.customer_id
+GROUP BY tc.account_type
+ORDER BY tc.account_type;
+"""
 
-st.markdown("---")
-st.header("3. Consultas y gráficas")
-st.caption("Próximamente")
+st.code(q_actividad_riesgo, language="sql")
+
+# ------------------------------------------------
+# Ejecutar consulta
+# ------------------------------------------------
+con = duckdb.connect(DB_PATH)
+df_actividad_riesgo = con.execute(q_actividad_riesgo).df()
+con.close()
+
+# ------------------------------------------------
+# Resultados contraídos
+# ------------------------------------------------
+with st.expander("Ver resultados"):
+
+    st.markdown("#### Tabla de resultados")
+    st.dataframe(df_actividad_riesgo, use_container_width=True)
+
+    # ------------------------------------------------
+    # Gráfica 1: proporción de riesgo por tipo de cuenta
+    # ------------------------------------------------
+    import matplotlib.pyplot as plt
+    import matplotlib.ticker as mtick
+    import numpy as np
+
+    tipos = df_actividad_riesgo["account_type"]
+    riesgo = df_actividad_riesgo["proporcion_riesgo"]
+    transacciones = df_actividad_riesgo["promedio_transacciones"]
+
+    fig_actividad_riesgo, ax = plt.subplots(figsize=(8, 5), dpi=130)
+
+    ax.bar(tipos, riesgo)
+    ax.set_title("Proporción de mora por tipo de cuenta", pad=12)
+    ax.set_xlabel("Tipo de cuenta")
+    ax.set_ylabel("Proporción de mora")
+    ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0))
+    ax.grid(True, axis="y", alpha=0.25)
+
+    plt.tight_layout()
+
+    st.markdown("#### Visualización")
+    st.pyplot(fig_actividad_riesgo, use_container_width=True)
+
+    st.markdown("""
+**Interpretación inicial**
+
+- Los clientes con **cuentas Checking** presentan la menor proporción de atraso, con un valor cercano al **12.3%**.  
+- Los clientes con **cuentas Savings** muestran una mora observada ligeramente mayor, alrededor de **13.8%**.  
+- Los clientes con **ambos tipos de cuenta (Both)** registran la mayor proporción de mora, aproximadamente **14.4%**.  
+
+En cuanto a la actividad financiera, el promedio de transacciones es bastante similar entre grupos, con valores cercanos a **10 transacciones por cliente**.  
+Esto sugiere que, en este dataset sintético, **no se observa una relación fuerte entre una mayor actividad transaccional y una menor probabilidad de atraso**.
+
+En conjunto, los resultados muestran que las diferencias en riesgo por tipo de cuenta existen, pero son moderadas, y no parecen explicarse únicamente por el volumen promedio de transacciones.
+""")
+
+
 
 
 # ============================================================
