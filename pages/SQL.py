@@ -67,8 +67,7 @@ y el **promedio de días de mora** por número de cuota.
 # ------------------------------------------------
 # Consulta SQL
 # ------------------------------------------------
-q = """
-select 
+q = """select 
     installment_n, 
     avg(days_late) as promedio_dias_mora, 
     avg(case when days_late > 0 then 1 else 0 end) as proporcion_mora
