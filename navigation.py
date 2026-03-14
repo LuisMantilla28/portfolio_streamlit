@@ -19,7 +19,7 @@ def show():
         if st.button("🏠 Inicio"):
             st.switch_page("app.py")
 
-        if st.button("🟦 SQL"):
+        if st.button("🛢 SQL"):
             st.switch_page("pages/SQL.py")
 
         if st.button("📈 Series de tiempo"):
