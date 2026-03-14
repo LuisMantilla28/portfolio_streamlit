@@ -75,7 +75,7 @@ from payments
 group by installment_n
 order by installment_n asc;
 """
-st.code(q_segmento, language="sql")
+st.code(q, language="sql")
 
 
 # ------------------------------------------------
