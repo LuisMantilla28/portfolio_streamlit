@@ -1,0 +1,12 @@
+{
+    "lags": 1,
+    "variables": [
+        "TA_Jur",
+        "DTF",
+        "IBR",
+        "IPC",
+        "Cuvr",
+        "Auvr"
+    ],
+    "observaciones": 146
+}
