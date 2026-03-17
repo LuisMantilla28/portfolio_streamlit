@@ -53,9 +53,10 @@ Un modelo útil debe reconocer ambas dimensiones cuando los datos así lo exigen
 # RUTAS DE ARCHIVOS
 # ============================================================
 
-BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / "data"
-FIG_DIR = BASE_DIR / "figures"
+ROOT_DIR = Path(__file__).resolve().parents[1]
+PROJECT_DIR = ROOT_DIR / "Series_tiempo" / "Multivariado"
+DATA_DIR = PROJECT_DIR / "data"
+FIG_DIR = PROJECT_DIR / "figures"
 
 
 # ============================================================
