@@ -58,6 +58,15 @@ PROJECT_DIR = ROOT_DIR / "Series_tiempo" / "Multivariado"
 DATA_DIR = PROJECT_DIR / "data"
 FIG_DIR = PROJECT_DIR / "figures"
 
+# Verificación rápida
+if not DATA_DIR.exists():
+    st.error(f"No existe la carpeta de datos: {DATA_DIR}")
+    st.stop()
+
+if not FIG_DIR.exists():
+    st.error(f"No existe la carpeta de figuras: {FIG_DIR}")
+    st.stop()
+
 
 # ============================================================
 # FUNCIONES AUXILIARES DE CARGA
