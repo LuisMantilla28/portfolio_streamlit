@@ -54,7 +54,7 @@ Un modelo útil debe reconocer ambas dimensiones cuando los datos así lo exigen
 # ============================================================
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
-PROJECT_DIR = ROOT_DIR / "Series_tiempo" / "Multivariado"
+PROJECT_DIR = ROOT_DIR / "pages"/"Series_tiempo" / "Multivariado"
 DATA_DIR = PROJECT_DIR / "data"
 FIG_DIR = PROJECT_DIR / "figures"
 
