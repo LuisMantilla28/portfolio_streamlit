@@ -1,16 +1,17 @@
 import streamlit as st
 
+
 def show():
-    # Ocultar menú nativo de Streamlit
-     hide_streamlit_style = """
+    custom_style = """
     <style>
-    /* Oculta la navegación nativa multipágina */
-    [data-testid="stSidebarNav"] {display: none;}
+    [data-testid="stSidebarNav"] {
+        display: none;
+    }
 
-    /* Oculta el header nativo, pero no rompe la sidebar */
-    header {visibility: hidden;}
+    header {
+        visibility: hidden;
+    }
 
-    /* Fuerza que la sidebar siempre permanezca visible */
     [data-testid="stSidebar"] {
         min-width: 18rem !important;
         max-width: 18rem !important;
@@ -28,7 +29,7 @@ def show():
     }
     </style>
     """
-    st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+    st.markdown(custom_style, unsafe_allow_html=True)
 
     with st.sidebar:
         st.title("📌 Navegación")
@@ -39,11 +40,11 @@ def show():
         if st.button("🏠 Inicio"):
             st.switch_page("app.py")
 
-        if st.button("🛢 SQL"):
+        if st.button("🟦 SQL"):
             st.switch_page("pages/SQL.py")
 
         if st.button("📈 Series de tiempo"):
-            st.switch_page("pages/multivariado.py")
+            st.write("Próximamente")
 
         if st.button("💰 Modelado financiero"):
             st.write("Próximamente")
