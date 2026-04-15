@@ -2,10 +2,30 @@ import streamlit as st
 
 def show():
     # Ocultar menú nativo de Streamlit
-    hide_streamlit_style = """
+     hide_streamlit_style = """
     <style>
+    /* Oculta la navegación nativa multipágina */
     [data-testid="stSidebarNav"] {display: none;}
+
+    /* Oculta el header nativo, pero no rompe la sidebar */
     header {visibility: hidden;}
+
+    /* Fuerza que la sidebar siempre permanezca visible */
+    [data-testid="stSidebar"] {
+        min-width: 18rem !important;
+        max-width: 18rem !important;
+        transform: none !important;
+        visibility: visible !important;
+    }
+
+    [data-testid="stSidebar"][aria-expanded="false"] {
+        min-width: 18rem !important;
+        max-width: 18rem !important;
+    }
+
+    [data-testid="stSidebar"][aria-expanded="false"] > div:first-child {
+        margin-left: 0rem !important;
+    }
     </style>
     """
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)
