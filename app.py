@@ -14,7 +14,7 @@ st.set_page_config(
 
 
 navigation.show()
-st.sidebar.write("Sidebar activa")
+
 
 # -----------------------------
 # Helpers
