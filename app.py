@@ -9,6 +9,7 @@ st.set_page_config(
     page_title="Luis Mantilla | Quant & Data Science Portfolio",
     page_icon="📈",
     layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 
