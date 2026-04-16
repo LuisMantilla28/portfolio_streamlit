@@ -83,6 +83,16 @@ Para responder estas preguntas, la página se organiza en cinco etapas:
 
 st.header("Fase 1. Radiografía de la cartera")
 
+st.write("""
+El primer paso del análisis consiste en entender la composición general de la cartera. Antes de estudiar incumplimiento o señales de alerta, es necesario identificar en qué productos se concentra el capital colocado, qué tan diversificada es la exposición y cuáles son las condiciones promedio de colocación.
+
+Desde la perspectiva de negocio, esta radiografía permite responder una pregunta fundamental: **dónde está realmente expuesto el banco**. Un producto puede tener una tasa alta y parecer atractivo, pero si su participación dentro de la cartera es baja, su impacto estratégico es limitado. De forma análoga, un producto con tasas moderadas puede representar un riesgo sistémico mayor si concentra la mayor parte del capital.
+
+En esta fase se analiza la cartera por producto, considerando el número de créditos, el capital desembolsado, la tasa promedio y el ticket promedio. Este diagnóstico inicial sirve como punto de partida para interpretar correctamente las fases posteriores del análisis.
+""")
+
+
+
 
 
 
