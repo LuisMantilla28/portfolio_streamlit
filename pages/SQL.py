@@ -28,7 +28,11 @@ st.markdown("---")
 st.header("1. Objetivo del análisis")
 
 st.write("""
-El propósito de esta página es evaluar la cartera de crédito desde una perspectiva de **riesgo, rentabilidad y oportunidad comercial**, utilizando consultas SQL sobre un entorno financiero sintético. En particular, el análisis busca responder qué productos concentran mayor exposición, cuáles presentan señales de deterioro en el pago, qué variables parecen explicar mejor la mora y qué perfiles de clientes representan oportunidades atractivas de crecimiento con riesgo controlado.
+El propósito de esta página es evaluar la cartera de crédito desde una perspectiva de **riesgo, rentabilidad y oportunidad comercial**, utilizando consultas SQL sobre un entorno financiero sintético. En particular, el análisis busca responder:
+1. Qué productos concentran mayor exposición
+2. Cuáles presentan señales de deterioro en el pago
+3. Qué variables parecen explicar mejor la mora 
+4. Qué perfiles de clientes representan oportunidades atractivas de crecimiento con riesgo controlado.
 """)
 
 st.markdown("---")
