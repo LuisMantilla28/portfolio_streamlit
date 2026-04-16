@@ -38,15 +38,20 @@ El propósito de esta página es evaluar la cartera de crédito desde una perspe
 st.header("2. Datos utilizados")
 
 st.write("""
-El caso se construye sobre una base de datos financiera sintética compuesta por información de **clientes, préstamos, pagos y transacciones**, diseñada para reproducir situaciones comunes de análisis bancario, cuyo código puede consultarse en [este repositorio de GitHub](https://github.com/LuisMantilla28/portfolio_streamlit/blob/cb9e647f0872bc61642a9abd746525ca663ef5f3/Notebooks/Generador_data.ipynb). La arquitectura relacional permite estudiar el negocio desde distintas capas: composición de cartera, comportamiento de pago, actividad transaccional y segmentación comercial.
 
-Las principales tablas utilizadas en esta página son:
+El análisis se apoya en una base de datos financiera sintética con estructura relacional, cuyo código puede consultarse en [este repositorio de GitHub](https://github.com/LuisMantilla28/portfolio_streamlit/blob/cb9e647f0872bc61642a9abd746525ca663ef5f3/Notebooks/Generador_data.ipynb), diseñada para representar el ciclo de vida de un cliente dentro de una entidad bancaria: desde su caracterización inicial, pasando por la colocación de productos de crédito, hasta su comportamiento de pago y su actividad transaccional. La relación entre tablas permite estudiar el riesgo no como un fenómeno aislado, sino como el resultado de la interacción entre perfil financiero, endeudamiento, cumplimiento y uso de canales.
 
-- **customers**: características demográficas, segmento, región, ingreso y score de riesgo.
-- **loans**: producto financiero, monto, plazo y tasa de interés.
-- **payments**: historial de cuotas, fechas de pago y días de mora.
-- **transactions**: comportamiento transaccional por canal y monto.
+Las tablas principales son las siguientes:
 
+- **customers**: contiene la información base de los clientes y funciona como eje central de segmentación del análisis. Incluye variables como segmento, región, ingreso mensual, score de riesgo y antigüedad, que permiten caracterizar el perfil financiero de cada persona y comparar comportamientos entre grupos.
+
+- **loans**: registra los productos de crédito asociados a cada cliente. Esta tabla permite analizar la composición de la cartera, el capital colocado, los plazos, las tasas de interés y la distribución del portafolio por tipo de producto. Es la base para estudiar la relación entre exposición, rentabilidad esperada y riesgo crediticio.
+
+- **payments**: almacena el detalle del comportamiento de pago de cada préstamo a nivel de cuota. Aquí se observan variables críticas como fecha pactada, fecha efectiva de pago, valor exigido, valor pagado y días de retraso. Esta tabla es fundamental para construir indicadores de mora, evaluar disciplina de pago y detectar deterioro en la calidad de la cartera.
+
+- **transactions**: recoge la actividad transaccional de los clientes a través de distintos canales y tipos de operación. Su valor analítico radica en que permite complementar la visión tradicional del riesgo con señales de comportamiento financiero cotidiano, como intensidad de uso, preferencia por canales y montos movilizados. Esto resulta especialmente útil para identificar alertas tempranas de estrés financiero o cambios en la relación del cliente con la entidad.
+
+La siguiente figura resume la estructura relacional del modelo de datos utilizado en esta página:
 """
 )
 
