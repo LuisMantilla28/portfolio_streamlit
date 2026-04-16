@@ -38,7 +38,7 @@ El propósito de esta página es evaluar la cartera de crédito desde una perspe
 st.header("2. Datos utilizados")
 
 st.write("""
-El caso se construye sobre una base de datos financiera sintética compuesta por información de **clientes, préstamos, pagos y transacciones**, diseñada para reproducir situaciones comunes de análisis bancario. La arquitectura relacional permite estudiar el negocio desde distintas capas: composición de cartera, comportamiento de pago, actividad transaccional y segmentación comercial.
+El caso se construye sobre una base de datos financiera sintética compuesta por información de **clientes, préstamos, pagos y transacciones**, diseñada para reproducir situaciones comunes de análisis bancario, cuyo código puede consultarse en [este repositorio de GitHub](https://github.com/LuisMantilla28/portfolio_streamlit/blob/cb9e647f0872bc61642a9abd746525ca663ef5f3/Notebooks/Generador_data.ipynb). La arquitectura relacional permite estudiar el negocio desde distintas capas: composición de cartera, comportamiento de pago, actividad transaccional y segmentación comercial.
 
 Las principales tablas utilizadas en esta página son:
 
