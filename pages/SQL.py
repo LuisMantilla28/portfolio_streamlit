@@ -81,7 +81,7 @@ Para responder estas preguntas, la página se organiza en cinco etapas:
 5. Finalmente, la identificación de un segmento objetivo de alto valor comercial.
 """)
 
-st.header("Fase 1. Radiografía de la cartera")
+st.subheader("Fase 1. Radiografía de la cartera")
 
 st.write("""
 El primer paso del análisis consiste en entender la composición general de la cartera. Antes de estudiar incumplimiento o señales de alerta, es necesario identificar en qué productos se concentra el capital colocado, qué tan diversificada es la exposición y cuáles son las condiciones promedio de colocación.
