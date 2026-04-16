@@ -10,14 +10,13 @@ DB_PATH="data/banking_risk.duckdb"
 navigation.show()
 layout="wide"
 
-st.title("SQL Analytics 🛢")
+st.title("SQL para Riesgo Bancario: Analítica Estratégica para Decisiones de Negocio")
 st.markdown("""
-Esta sección presenta una serie de **análisis exploratorios realizados en SQL** sobre un dataset bancario sintético que simula el funcionamiento de una cartera de crédito real.
+Esta sección presenta un proyecto de analítica aplicada al riesgo bancario desarrollado con **SQL, DuckDB y visualización de datos**, con el propósito de convertir información operativa en decisiones estratégicas. A partir de un ecosistema financiero sintético que integra clientes, préstamos, pagos y transacciones, el análisis se estructura como una historia de negocio que conecta **rentabilidad, calidad de cartera, comportamiento de pago y oportunidades comerciales**.
 
-El objetivo es demostrar el uso de **consultas analíticas**, incluyendo **joins multi-tabla, agregaciones, construcción de métricas de riesgo y análisis de comportamiento financiero**.  
-Cada ejemplo parte de una **pregunta de negocio**, muestra la **consulta SQL utilizada** y presenta los **resultados mediante tablas y visualizaciones**.
+Más allá de describir métricas aisladas, la página busca mostrar una capacidad clave para roles en **riesgo, analítica y finanzas cuantitativas**: construir consultas que permitan diagnosticar el portafolio, detectar patrones relevantes y traducir hallazgos en recomendaciones accionables. El recorrido analítico parte de la composición de la cartera y su exposición por producto, profundiza en los indicadores de mora y en la relación entre ingreso y perfil de riesgo, incorpora señales tempranas desde el comportamiento transaccional y culmina con la identificación de un segmento objetivo de alto valor comercial.
 
-Las consultas están diseñadas para reflejar escenarios comunes en **analytics bancario y riesgo crediticio**, como el análisis de mora, segmentación de clientes y relación entre comportamiento financiero y riesgo.
+En conjunto, esta página funciona como una demostración de portafolio orientada a entornos financieros reales, donde el uso de SQL no se limita a extraer datos, sino que se convierte en una herramienta para **entender el negocio, explicar el riesgo y apoyar la toma de decisiones basada en evidencia**.
 """)
 
 st.markdown("---")
