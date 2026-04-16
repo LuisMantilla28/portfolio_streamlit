@@ -108,8 +108,6 @@ st.code(query_radiografia, language="sql")
 con = duckdb.connect(DB_PATH, read_only=True)
 df_radiografia = con.execute(query_radiografia).df()
 con.close()
-
-st.markdown("### Resultado de la consulta")
 st.dataframe(df_radiografia, use_container_width=True, hide_index=True)
 
 
