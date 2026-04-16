@@ -35,6 +35,24 @@ El propósito de esta página es evaluar la cartera de crédito desde una perspe
 4. Qué perfiles de clientes representan oportunidades atractivas de crecimiento con riesgo controlado.
 """)
 
+st.header("2. Datos utilizados")
+
+st.write("""
+El caso se construye sobre una base de datos financiera sintética compuesta por información de **clientes, préstamos, pagos y transacciones**, diseñada para reproducir situaciones comunes de análisis bancario. La arquitectura relacional permite estudiar el negocio desde distintas capas: composición de cartera, comportamiento de pago, actividad transaccional y segmentación comercial.
+
+Las principales tablas utilizadas en esta página son:
+
+- **customers**: características demográficas, segmento, región, ingreso y score de riesgo.
+- **loans**: producto financiero, monto, plazo y tasa de interés.
+- **payments**: historial de cuotas, fechas de pago y días de mora.
+- **transactions**: comportamiento transaccional por canal y monto.
+
+"""
+)
+
+
+
+
 st.markdown("---")
 
 st.subheader("Modelo relacional del dataset")
