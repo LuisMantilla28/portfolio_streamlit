@@ -25,14 +25,10 @@ st.markdown("---")
 # 1. Contextualización de los datos
 # ============================================================
 
-st.header("1. Contextualización de los datos")
+st.header("1. Objetivo del análisis")
 
 st.write("""
-El análisis se desarrolla sobre un **dataset bancario sintético (2022–2025)** diseñado para simular el funcionamiento integral de una cartera de crédito y su actividad transaccional. No se trata de datos aleatorios: las variables están estructuradas bajo una lógica económica coherente:
-
-**Ingreso → Score → Tasa → Probabilidad de Incumplimiento (PD) → Mora**
-
-El modelo sigue una estructura relacional típica de sistemas financieros reales.
+El propósito de esta página es evaluar la cartera de crédito desde una perspectiva de **riesgo, rentabilidad y oportunidad comercial**, utilizando consultas SQL sobre un entorno financiero sintético. En particular, el análisis busca responder qué productos concentran mayor exposición, cuáles presentan señales de deterioro en el pago, qué variables parecen explicar mejor la mora y qué perfiles de clientes representan oportunidades atractivas de crecimiento con riesgo controlado.
 """)
 
 st.markdown("---")
