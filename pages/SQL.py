@@ -111,7 +111,24 @@ con.close()
 st.dataframe(df_radiografia, use_container_width=True, hide_index=True)
 
 
+st.write("""
 
+Al observar los resultados, se identifican tres hallazgos críticos sobre la estructura financiera de NovaBank:
+1. Concentración de Capital en Activos Garantizados: El producto "Vehículo" es el motor de colocación del banco. Aunque solo representa el 20% de la cantidad de créditos, concentra más de 3 millones de dolares, lo que equivale a casi el 48% del capital total de la muestra. Esto indica un modelo de negocio fuertemente respaldado por garantías reales.
+2. Liderazgo en Margen vs. Baja Exposición: Las "Tarjetas de Crédito" presentan la tasa más alta del portafolio (33.16%), superando por más de 12 puntos básicos a la Libranza. Sin embargo, es el producto con menor capital colocado (460k), sugiriendo que es un producto de alta rentabilidad pero con cupos más controlados o menor penetración.
+3. Dominio de Consumo en el Mercado Masivo: El producto "Consumo" es el más popular en volumen (348 créditos). Su tasa del 26.79% lo posiciona como un producto equilibrado: masivo y con un rendimiento superior al promedio de la cartera comercial.
+
+
+Decisiones Estratégicas (Preliminares)
+A partir de esta radiografía, la dirección del banco podría considerar las siguientes acciones:
+
+- Protección del Activo Crítico: Dado que casi la mitad del dinero está en "Vehículo", cualquier fluctuación en este mercado impactaría fuertemente la solvencia del banco. Se deben mantener políticas de avalúo estrictas.
+- Oportunidad de Expansión en Tarjetas: Existe un margen de rentabilidad muy atractivo en tarjetas. Si la mora lo permite, hay espacio para aumentar el capital colocado en este producto y maximizar los ingresos por intereses.
+- Fidelización en Libranza: Siendo el producto con la tasa más baja (20.94%), la Libranza debe ser utilizada como "producto ancla" para atraer clientes de bajo riesgo que luego puedan migrar a Consumo o Tarjeta.
+
+Este análisis inicial nos muestra una cartera teóricamente rentable, especialmente en el segmento de tarjetas. Sin embargo, la tasa de interés no es utilidad real hasta que el cliente paga.
+El siguiente paso lógico es validar si ese margen del 33% en tarjetas se mantiene o si se ve erosionado por el incumplimiento. Por lo tanto, nuestra próxima consulta se enfocará en el Análisis de Mora y Comportamiento de Pago, para determinar si los productos con mayores tasas son también los que presentan mayores retrasos.
+""")
 
 
 
