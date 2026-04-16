@@ -91,6 +91,27 @@ Desde la perspectiva de negocio, esta radiografía permite responder una pregunt
 En esta fase se analiza la cartera por producto, considerando el número de créditos, el capital desembolsado, la tasa promedio y el ticket promedio. Este diagnóstico inicial sirve como punto de partida para interpretar correctamente las fases posteriores del análisis.
 """)
 
+query_radiografia = """
+SELECT 
+    product,
+    COUNT(loan_id) AS total_creditos,
+    SUM(amount) AS capital_colocado,
+    ROUND(AVG(interest_rate) * 100, 2) AS tasa_promedio_ea
+FROM loans
+GROUP BY product
+ORDER BY capital_colocado DESC;
+"""
+
+st.markdown("### Consulta SQL")
+st.code(query_radiografia, language="sql")
+
+con = duckdb.connect(DB_PATH, read_only=True)
+df_radiografia = con.execute(query_radiografia).df()
+con.close()
+
+st.markdown("### Resultado de la consulta")
+st.dataframe(df_radiografia, use_container_width=True, hide_index=True)
+
 
 
 
