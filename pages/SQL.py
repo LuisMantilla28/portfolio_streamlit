@@ -50,16 +50,16 @@ Las principales tablas utilizadas en esta página son:
 """
 )
 
-
+st.image(
+    "assets/diagrama_db.png",
+)
 
 
 st.markdown("---")
 
 st.subheader("Modelo relacional del dataset")
 
-st.image(
-    "assets/diagrma_sql_portafolio.png",
-)
+
 
 st.caption(
     "Esquema relacional del modelo. Las flechas representan relaciones por llave foránea (la linea continua significa que la llave clave hija depende de la tabla padre)."
