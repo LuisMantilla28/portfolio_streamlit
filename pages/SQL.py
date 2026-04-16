@@ -63,7 +63,6 @@ st.markdown("A nivel analítico, cada tabla cumple un rol distinto dentro de la 
 
 st.header("3. Preguntas de negocio")
 
-
 st.write("""
 A partir de la estructura de datos presentada, el análisis se orienta a responder una serie de preguntas relevantes desde la perspectiva de riesgo y negocio:
 
@@ -72,7 +71,18 @@ A partir de la estructura de datos presentada, el análisis se orienta a respond
 - ¿Qué explica mejor el deterioro crediticio: el ingreso del cliente o su score de riesgo?
 - ¿Existen patrones transaccionales que funcionen como señales tempranas de alerta?
 - ¿Qué clientes representan una oportunidad comercial atractiva por su bajo riesgo y alto potencial de vinculación?
+
+Para responder estas preguntas, la página se organiza en cinco etapas: 
+
+1. Radiografía inicial de la cartera
+2. Análisis de mora por producto
+3. Comparación entre ingreso y score como predictores de riesgo
+4. Exploración de señales tempranas a partir del comportamiento transaccional 
+5. Finalmente, la identificación de un segmento objetivo de alto valor comercial.
 """)
+
+st.header("Fase 1. Radiografía de la cartera")
+
 
 
 
@@ -86,6 +96,12 @@ st.subheader("Modelo relacional del dataset")
 st.caption(
     "Esquema relacional del modelo. Las flechas representan relaciones por llave foránea (la linea continua significa que la llave clave hija depende de la tabla padre)."
 )
+
+
+
+
+
+
 
 st.markdown("---")
 
