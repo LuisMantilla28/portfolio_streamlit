@@ -59,6 +59,23 @@ st.image(
     "assets/diagrama_db.png",
 )
 
+st.markdown("A nivel analítico, cada tabla cumple un rol distinto dentro de la historia del negocio:")
+
+st.header("3. Preguntas de negocio")
+
+
+st.write("""
+A partir de la estructura de datos presentada, el análisis se orienta a responder una serie de preguntas relevantes desde la perspectiva de riesgo y negocio:
+
+- ¿Qué productos concentran la mayor parte del capital colocado y cuáles ofrecen las tasas más altas?
+- ¿En qué segmentos del portafolio se observan mayores niveles de mora?
+- ¿Qué explica mejor el deterioro crediticio: el ingreso del cliente o su score de riesgo?
+- ¿Existen patrones transaccionales que funcionen como señales tempranas de alerta?
+- ¿Qué clientes representan una oportunidad comercial atractiva por su bajo riesgo y alto potencial de vinculación?
+""")
+
+
+
 
 st.markdown("---")
 
