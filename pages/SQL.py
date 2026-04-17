@@ -253,7 +253,7 @@ plt.legend(title='Segmento de Cliente', title_fontsize='11', loc='upper left')
 sns.despine(left=True, bottom=True)
 
 plt.tight_layout()
-st.pyplot(fig)
+st.pyplot(plt)
 
 st.write("""
 Al observar la tabla completa, emergen tres descubrimientos que redefinirán la estrategia del banco:
