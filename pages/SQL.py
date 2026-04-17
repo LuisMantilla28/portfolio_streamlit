@@ -183,7 +183,7 @@ Si la mora es similar en todos los productos, ¿quiénes son realmente los clien
 
 st.subheader("Fase 3. El Mito del Ingreso vs. La Realidad del Score")
 st.write("""
-ingresos, menor es el riesgo de impago. Sin embargo, para un analista de datos, las suposiciones deben validarse con evidencia. En esta fase, cruzamos la información demográfica de los clientes con su historial real de pagos. categorizamos a los clientes en tres niveles de riesgo (Bajo, Medio y Alto) basándonos en su risk_score y comparamos su ingreso promedio frente a su mora histórica (promedio de días de retraso).
+En el sector financiero, existe la creencia común de que a mayores ingresos, menor es el riesgo de impago. Sin embargo, para un analista de datos, las suposiciones deben validarse con evidencia. En esta fase, cruzamos la información demográfica de los clientes con su historial real de pagos. categorizamos a los clientes en tres niveles de riesgo (Bajo, Medio y Alto) basándonos en su risk_score y comparamos su ingreso promedio frente a su mora histórica (promedio de días de retraso).
 """)
 
 query_ingreso = """
