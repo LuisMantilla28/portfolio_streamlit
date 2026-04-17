@@ -113,7 +113,7 @@ st.dataframe(df_radiografia, use_container_width=True, hide_index=True)
 
 st.write("""
 
-Al observar los resultados, se identifican tres hallazgos críticos sobre la estructura financiera de NovaBank:
+Al observar los resultados, se identifican tres hallazgos críticos sobre la estructura financiera del banco:
 1. Concentración de Capital en Activos Garantizados: El producto "Vehículo" es el motor de colocación del banco. Aunque solo representa el 20% de la cantidad de créditos, concentra más de 3 millones de dolares, lo que equivale a casi el 48% del capital total de la muestra. Esto indica un modelo de negocio fuertemente respaldado por garantías reales.
 2. Liderazgo en Margen vs. Baja Exposición: Las "Tarjetas de Crédito" presentan la tasa más alta del portafolio (33.16%), superando por más de 12 puntos básicos a la Libranza. Sin embargo, es el producto con menor capital colocado (460k), sugiriendo que es un producto de alta rentabilidad pero con cupos más controlados o menor penetración.
 3. Dominio de Consumo en el Mercado Masivo: El producto "Consumo" es el más popular en volumen (348 créditos). Su tasa del 26.79% lo posiciona como un producto equilibrado: masivo y con un rendimiento superior al promedio de la cartera comercial.
@@ -130,6 +130,47 @@ Este análisis inicial nos muestra una cartera teóricamente rentable, especialm
 El siguiente paso lógico es validar si ese margen del 33% en tarjetas se mantiene o si se ve erosionado por el incumplimiento. Por lo tanto, nuestra próxima consulta se enfocará en el Análisis de Mora y Comportamiento de Pago, para determinar si los productos con mayores tasas son también los que presentan mayores retrasos.
 """)
 
+
+st.subheader("Fase 2. El Impacto de la Mora en la Rentabilidad")
+st.write("""
+Una tasa de interés alta es atractiva solo si el cliente paga a tiempo. En esta etapa, cruzamos la tabla de préstamos con la de pagos para validar si el margen superior que vimos en las Tarjetas de Crédito se ve amenazado por el incumplimiento. Utilizamos una CTE (Common Table Expression) para categorizar cada una de las más de 13,000 cuotas y calcular dos métricas críticas: el promedio de días de retraso y el índice de mora, que representa el porcentaje de cuotas que no se pagaron en la fecha pactada.
+""")
+
+query_mora = """
+SELECT 
+    product,
+    COUNT(loan_id) AS total_creditos,
+    SUM(amount) AS capital_colocado,
+    ROUND(AVG(interest_rate) * 100, 2) AS tasa_promedio_ea
+FROM loans
+GROUP BY product
+ORDER BY capital_colocado DESC;
+"""
+
+st.markdown("### Consulta SQL")
+st.code(query_mora, language="sql")
+
+con = duckdb.connect(DB_PATH, read_only=True)
+df_mora = con.execute(query_mora).df()
+con.close()
+st.dataframe(df_mora, use_container_width=True, hide_index=True)
+
+st.write("""
+Al analizar los resultados, observamos un patrón de riesgo consistente pero con matices importantes:
+
+1. Confirmación del Perfil de Riesgo en Tarjetas: Como se sospechaba, la Tarjeta de Crédito lidera tanto el promedio de retraso (2.76 días) como el índice de mora (13.76%). Esto justifica que sea el producto con la tasa más alta; el banco cobra más porque, efectivamente, es donde los clientes fallan más.
+2. Estabilidad de la Libranza: El producto Libranza presenta el mejor comportamiento de pago (mora del 12.95% y solo 2.52 días de retraso). Esto es coherente con la naturaleza del producto, donde las cuotas suelen descontarse directamente de la nómina del cliente, reduciendo la probabilidad de olvido o desvío de fondos.
+3. Homogeneidad en la Mora: Un hallazgo sorprendente es la poca dispersión entre productos. La diferencia entre el producto más riesgoso (Tarjeta) y el más seguro (Libranza) es de apenas 0.81 puntos porcentuales en el índice de mora. Esto sugiere que el riesgo de impago en NovaBank está más influenciado por el perfil del cliente que por el tipo de préstamo en sí.
+
+Decisiones Estratégicas Basadas en la Mora
+
+- Optimización de Cobranzas en Tarjetas: Dado que el 13.7% de las cuotas de tarjetas entran en mora, se recomienda implementar recordatorios preventivos (SMS/Email) 3 días antes del vencimiento para este producto específico.
+- Margen de Maniobra en Vehículos: A pesar de tener cuotas mucho más altas en dinero (como vimos en la Fase 1), los clientes de Vehículo son casi tan cumplidos como los de Consumo (13.49% de mora). El banco puede estar tranquilo con su exposición en este sector, ya que la garantía real parece incentivar el pago oportuno.
+
+Hemos confirmado que las tarjetas son el producto más riesgoso, pero la diferencia con los demás productos es pequeña. Esto nos plantea una nueva e inquietante pregunta:
+
+Si la mora es similar en todos los productos, ¿quiénes son realmente los clientes que no pagan? ¿Son las personas con ingresos bajos las que tienen más dificultades, o existe una paradoja de riesgo donde clientes con altos ingresos también presentan moras altas debido a su score crediticio?
+""")
 
 
 
