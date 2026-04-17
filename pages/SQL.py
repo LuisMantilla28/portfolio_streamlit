@@ -427,7 +427,7 @@ st.dataframe(df_golden , use_container_width=True, hide_index=True)
 
 
 st.write("""
-Al analizar el listado de los 10 candidatos principales, emergen perfiles de alto valor que NovaBank debería capitalizar de inmediato:
+Al analizar el listado de los 10 candidatos principales, emergen perfiles de alto valor que el banco debería capitalizar de inmediato:
 
 1. El Cliente de Alta Fidelidad (Caso ID 3): Identificamos a un cliente con un ingreso sobresaliente de 6,869 y la mayor frecuencia transaccional de la muestra (17 operaciones). Con un score de 697, es el candidato ideal para un producto premium (como una Tarjeta Black o un crédito de Consumo de alto monto), ya que su operatividad diaria demuestra una dependencia total del ecosistema del banco.
 2. Solidez en el Score (Caso ID 431 y 8): Los clientes en las primeras posiciones presentan scores de 734 y 732. Son perfiles con un hábito de pago excelente que hoy no generan intereses para el banco. Su inclusión en la cartera de créditos ayudaría a equilibrar el promedio de mora que vimos en las fases anteriores.
@@ -449,7 +449,7 @@ A través de este viaje por los datos, hemos transformado simples tablas en una 
 3. Descubrimos que la caída en el uso de BillPay y el ticket de POS son señales de alerta antes de que ocurra el impago.
 4. Y finalmente, encontramos el 'Tesoro Escondido': clientes fieles y solventes listos para ser contactados.
 
-NovaBank está ahora posicionado para dejar de reaccionar ante el riesgo y empezar a predecirlo y gestionarlo.
+El banco está ahora posicionado para dejar de reaccionar ante el riesgo y empezar a predecirlo y gestionarlo.
 """)
 
 
