@@ -109,6 +109,10 @@ st.code(query_radiografia, language="sql")
 con = duckdb.connect(DB_PATH, read_only=True)
 df_radiografia = con.execute(query_radiografia).df()
 con.close()
+col1, col2, col3 = st.columns(3)
+col1.metric("Capital Total", f"${df_radiografia['capital_colocado'].sum():,.0f}")
+col2.metric("Tasa Promedio", f"{df_radiografia['tasa_promedio_ea'].mean():.2f}%")
+col3.metric("Total Créditos", f"{df_radiografia['total_creditos'].sum():,}")
 st.dataframe(df_radiografia, use_container_width=True, hide_index=True)
 
 
