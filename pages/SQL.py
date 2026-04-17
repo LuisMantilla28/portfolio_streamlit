@@ -84,12 +84,11 @@ Para responder estas preguntas, la página se organiza en cinco etapas:
 st.subheader("Fase 1. Radiografía de la cartera")
 
 st.write("""
-El primer paso del análisis consiste en entender la composición general de la cartera. Antes de estudiar incumplimiento o señales de alerta, es necesario identificar en qué productos se concentra el capital colocado, qué tan diversificada es la exposición y cuáles son las condiciones promedio de colocación.
+El primer paso del análisis consiste en examinar la composición general de la cartera. Antes de estudiar el incumplimiento o posibles señales de alerta, resulta útil identificar en qué productos se concentra el capital colocado, qué tan diversificada es la exposición y cuáles son las condiciones promedio de colocación.
 
-Desde la perspectiva de negocio, esta radiografía permite responder una pregunta fundamental: **dónde está realmente expuesto el banco**. Un producto puede tener una tasa alta y parecer atractivo, pero si su participación dentro de la cartera es baja, su impacto estratégico es limitado. De forma análoga, un producto con tasas moderadas puede representar un riesgo sistémico mayor si concentra la mayor parte del capital.
+Desde la perspectiva del negocio, esta radiografía permite ubicar los segmentos con mayor peso dentro del portafolio. Un producto puede ofrecer una tasa alta y parecer atractivo, pero si su participación en la cartera es reducida, su impacto agregado es limitado. De forma similar, un producto con tasas más moderadas puede ser especialmente relevante si concentra una proporción importante del capital expuesto.
 
-En esta fase consolidamos la información de la tabla loans por tipo de producto, lo que nos permite identificar la exposición de capital del banco (capital_colocado), el volumen de operaciones (total_creditos) y el rendimiento esperado pactado a través de la tasa promedio efectivo anual."
-""")
+En esta fase se consolida la información de la tabla `loans` por tipo de producto, con el fin de resumir tres dimensiones básicas del portafolio: la exposición de capital (`capital_colocado`), el volumen de operaciones (`total_creditos`) y la tasa promedio pactada en términos efectivos anuales (`tasa_promedio_ea`).""")
 
 query_radiografia = """
 SELECT 
