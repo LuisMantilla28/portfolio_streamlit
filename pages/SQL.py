@@ -377,7 +377,7 @@ La pregunta final para cerrar esta estrategia de negocio es: ¿Cómo crecemos ah
 En el paso final de este informe, identificaremos al 'Golden Target': clientes que hoy son sumamente activos en transacciones, tienen ingresos sólidos y un riesgo bajo, pero que extrañamente no poseen ningún préstamo con nosotros. Ellos son la clave para sanear la cartera y maximizar la rentabilidad sin aumentar el riesgo.
 """)
 
-st.subheader("Fase 5. Conclusión y Estrategia: El Segmento "Golden Target"")
+st.subheader("Fase 5. Conclusión y Estrategia: El Segmento 'Golden Target' ")
 st.write("""
 Tras identificar los focos de riesgo y los patrones de comportamiento de los clientes morosos, la última etapa de este análisis se enfoca en la expansión rentable. El objetivo es detectar a los clientes 'invisibles' para el área de crédito: personas que utilizan activamente el banco, pero que aún no poseen préstamos. Mediante el uso de CTEs y JOINS de exclusión, filtramos a los clientes con scores superiores a 600 y actividad transaccional constante para proponer una estrategia de colocación de bajo riesgo.
 
@@ -386,98 +386,70 @@ Al intentar buscar clientes con scores perfectos (>750) y sin deudas, descubrimo
 Por ello, decidimos ajustar nuestra búsqueda hacia el 'Top de Oportunidad': clientes con scores superiores a 600 y actividad constante. Estos no son 'diamantes puros', pero son clientes sólidos que están usando el banco para sus gastos diarios y que representan nuestra mejor oportunidad de expansión inmediata sin comprometer la salud de la cartera.
 """)
 
-query_alerta = """
-WITH PerfilPuntualidad AS (
+query_golden = """
+WITH ClientesPremium AS (
     SELECT 
-        customer_id,
-        CASE WHEN AVG(days_late) > 7 THEN 'Moroso' ELSE 'Puntual' END AS estado_cliente
-    FROM payments
+        cust.customer_id, 
+        cust.income_monthly, 
+        cust.risk_score
+    FROM customers AS cust
+    LEFT JOIN loans AS lon ON cust.customer_id = lon.customer_id
+    WHERE lon.loan_id IS NULL -- Que no tengan préstamos
+    AND cust.risk_score > 600 -- un escore para considerar como bueno
+),
+ActividadTransaccional AS (
+    SELECT 
+        customer_id, 
+        COUNT(*) AS frecuencia_uso
+    FROM transactions
     GROUP BY customer_id
+    HAVING COUNT(*) >= 5 -- ver los mas activos del grupo 
 )
 SELECT 
-    pp.estado_cliente,
-    t.tx_type,
-    COUNT(t.tx_id) AS volumen_transacciones,
-    ROUND(AVG(t.amount), 2) AS monto_promedio_tx
-FROM transactions t
-JOIN PerfilPuntualidad pp ON t.customer_id = pp.customer_id
-GROUP BY 1, 2
-ORDER BY 1, 3 DESC;
+    cp.customer_id,
+    cp.income_monthly,
+    cp.risk_score,
+    act.frecuencia_uso
+FROM ClientesPremium AS cp
+JOIN ActividadTransaccional AS act ON cp.customer_id = act.customer_id
+ORDER BY cp.risk_score DESC, cp.income_monthly DESC
+LIMIT 10;
 """
 
 st.markdown("### Consulta SQL")
-st.code(query_alerta , language="sql")
+st.code(query_golden , language="sql")
 
 con = duckdb.connect(DB_PATH, read_only=True)
-df_alerta  = con.execute(query_alerta ).df()
+df_golden = con.execute(query_golden ).df()
 con.close()
-st.dataframe(df_alerta , use_container_width=True, hide_index=True)
+st.dataframe(df_golden , use_container_width=True, hide_index=True)
 
 
-# Configuración de estilo
-sns.set_theme(style="white")
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 7))
-
-# --- Gráfico 1: Volumen de Transacciones ---
-# Usamos escala logarítmica para que las barras de los morosos sean visibles 
-# y se note la diferencia de magnitud.
-sns.barplot(
-    data=df_alerta, 
-    x='tx_type', 
-    y='volumen_transacciones', 
-    hue='estado_cliente', 
-    ax=ax1,
-    palette='magma'
-)
-ax1.set_yscale("log") # Escala logarítmica para ver la diferencia de miles vs decenas
-ax1.set_title('Frecuencia de Uso por Canal (Escala Log)', fontsize=14, fontweight='bold')
-ax1.set_xlabel('Tipo de Transacción')
-ax1.set_ylabel('Número de Transacciones (Log)')
-
-# --- Gráfico 2: Monto Promedio por Transacción ---
-sns.barplot(
-    data=df_alerta, 
-    x='tx_type', 
-    y='monto_promedio_tx', 
-    hue='estado_cliente', 
-    ax=ax2,
-    palette='magma'
-)
-ax2.set_title('Ticket Promedio: Puntuales vs Morosos', fontsize=14, fontweight='bold')
-ax2.set_xlabel('Tipo de Transacción')
-ax2.set_ylabel('Monto Promedio ($)')
-
-# Añadir etiquetas de datos en el gráfico de montos
-for container in ax2.containers:
-    ax2.bar_label(container, fmt='%.0f', padding=3, fontsize=9)
-
-plt.suptitle('Análisis del "Desierto Transaccional" en Clientes con Mora', fontsize=18, fontweight='bold', y=1.02)
-plt.tight_layout()
-plt.show()
-st.pyplot(plt)
 
 st.write("""
-Al comparar ambos grupos, los datos revelan una diferencia drástica y reveladora en el estilo de vida financiero:
-1. El "Abandono del Ecosistema Digital":
-    - Los clientes Puntuales utilizan todo el abanico de servicios, destacando montos altos en BillPay (826.00) y Transfer (747.03).
-    - Por el contrario, en el grupo Moroso, el uso de BillPay es inexistente (0) y las transferencias son mínimas. Esto sugiere que cuando un cliente empieza a fallar en sus créditos, lo primero que hace es dejar de usar el banco para pagar sus servicios básicos, rompiendo el vínculo digital con la entidad.
-2. Diferencia Crítica en la Capacidad de Gasto:
-    - Existe una brecha enorme en los montos. Mientras un cliente puntual gasta en promedio 201.93 en una compra POS (comercio), el cliente moroso solo gasta 78.67.
-    - Esto indica que el cliente moroso no solo está fallando en su crédito, sino que su capacidad de consumo diario se ha reducido a menos de la tercera parte, una señal clara de estrés financiero profundo.
-3. La "Fuga" hacia el Efectivo:
-    - Aunque el volumen es bajo, el grupo moroso mantiene actividad en ATM (Cajeros) y POS. Esto demuestra que el poco flujo de caja que poseen lo destinan a gastos de supervivencia inmediata (efectivo y compras físicas pequeñas), alejándose de los canales de ahorro o pagos programados.
+Al analizar el listado de los 10 candidatos principales, emergen perfiles de alto valor que NovaBank debería capitalizar de inmediato:
 
-Decisiones Estratégicas (Alertas Tempranas)
+1. El Cliente de Alta Fidelidad (Caso ID 3): Identificamos a un cliente con un ingreso sobresaliente de 6,869 y la mayor frecuencia transaccional de la muestra (17 operaciones). Con un score de 697, es el candidato ideal para un producto premium (como una Tarjeta Black o un crédito de Consumo de alto monto), ya que su operatividad diaria demuestra una dependencia total del ecosistema del banco.
+2. Solidez en el Score (Caso ID 431 y 8): Los clientes en las primeras posiciones presentan scores de 734 y 732. Son perfiles con un hábito de pago excelente que hoy no generan intereses para el banco. Su inclusión en la cartera de créditos ayudaría a equilibrar el promedio de mora que vimos en las fases anteriores.
+3. Potencial de Inclusión (Caso ID 86): Incluso con ingresos más moderados (881), existen clientes con scores sólidos (696) que están usando el banco de forma recurrente. Esto demuestra que la oportunidad de crecimiento no es exclusiva de los segmentos altos, sino de cualquiera con disciplina financiera.
 
-- Indicador de Alerta "BillPay Zero": Se propone crear un evento automático: si un cliente que solía pagar sus facturas (BillPay) deja de hacerlo por 30 días, el sistema debe etiquetarlo como "Riesgo Emergente", incluso antes de que falle en su primera cuota de préstamo.
-- Reducción Proactiva de Riesgo: Para clientes que muestren una caída drástica en su ticket promedio de POS (de >200 a <80), el banco debería bloquear preventivamente los aumentos de cupo en tarjetas de crédito.
-- Campaña de Retención Digital: Ofrecer incentivos para el uso de canales digitales a clientes en riesgo para mantener la visibilidad de su flujo de caja y evitar que se vuelvan "invisibles" al operar solo en efectivo.
 
-Hemos completado el ciclo: sabemos qué productos son rentables, quiénes tienen peor score, y cómo se comportan transaccionalmente cuando están en problemas.
+Decisiones Finales y Recomendaciones Estratégicas
 
-La pregunta final para cerrar esta estrategia de negocio es: ¿Cómo crecemos ahora de forma segura?
+Con base en todo el análisis realizado (desde la rentabilidad por producto hasta la detección de este Golden Target), se proponen las siguientes acciones:
 
-En el paso final de este informe, identificaremos al 'Golden Target': clientes que hoy son sumamente activos en transacciones, tienen ingresos sólidos y un riesgo bajo, pero que extrañamente no poseen ningún préstamo con nosotros. Ellos son la clave para sanear la cartera y maximizar la rentabilidad sin aumentar el riesgo.
+- Oferta de 'Bajo Roce': Iniciar una campaña de pre-aprobados para estos 10 IDs. Al ser clientes activos y de bajo riesgo, el proceso de aprobación debe ser automático para garantizar una tasa de conversión alta.
+- Balanceo de Cartera: Por cada nuevo crédito otorgado a este segmento, el banco reduce su riesgo relativo, permitiéndonos compensar las pérdidas potenciales del segmento Mass / Riesgo Alto identificado en la Fase 3.
+- Monitoreo Transaccional: Establecer la Frecuencia de Uso (como vimos en el ID 3 con sus 17 tx) como un nuevo criterio de aprobación. Un cliente que usa mucho el banco tiene un "costo de quedar mal" más alto, lo que lo hace intrínsecamente más responsable.
+
+A través de este viaje por los datos, hemos transformado simples tablas en una hoja de ruta estratégica:
+
+1. Identificamos que el Vehículo protege nuestro capital y la Tarjeta nuestro margen.
+2. Desmitificamos el ingreso, demostrando que el Score es el verdadero predictor de la mora.
+3. Descubrimos que la caída en el uso de BillPay y el ticket de POS son señales de alerta antes de que ocurra el impago.
+4. Y finalmente, encontramos el 'Tesoro Escondido': clientes fieles y solventes listos para ser contactados.
+
+NovaBank está ahora posicionado para dejar de reaccionar ante el riesgo y empezar a predecirlo y gestionarlo.
 """)
 
 
