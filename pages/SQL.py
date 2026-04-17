@@ -111,22 +111,24 @@ st.dataframe(df_radiografia, use_container_width=True, hide_index=True)
 
 
 st.write("""
+A partir de los resultados obtenidos, pueden destacarse tres observaciones principales sobre la estructura de la cartera:
 
-Al observar los resultados, se identifican tres hallazgos críticos sobre la estructura financiera del banco:
-1. Concentración de Capital en Activos Garantizados: El producto "Vehículo" es el motor de colocación del banco. Aunque solo representa el 20% de la cantidad de créditos, concentra más de 3 millones de dolares, lo que equivale a casi el 48% del capital total de la muestra. Esto indica un modelo de negocio fuertemente respaldado por garantías reales.
-2. Liderazgo en Margen vs. Baja Exposición: Las "Tarjetas de Crédito" presentan la tasa más alta del portafolio (33.16%), superando por más de 12 puntos básicos a la Libranza. Sin embargo, es el producto con menor capital colocado (460k), sugiriendo que es un producto de alta rentabilidad pero con cupos más controlados o menor penetración.
-3. Dominio de Consumo en el Mercado Masivo: El producto "Consumo" es el más popular en volumen (348 créditos). Su tasa del 26.79% lo posiciona como un producto equilibrado: masivo y con un rendimiento superior al promedio de la cartera comercial.
+1. **Concentración del capital en Vehículo.**  
+   El producto **Vehículo** concentra la mayor parte del capital colocado. Aunque no es el producto con más operaciones, sí representa una proporción importante de la exposición total, lo que sugiere que este segmento tiene un peso central dentro del portafolio analizado.
 
+2. **Tarjetas de Crédito: alta tasa, baja participación en capital.**  
+   Las **Tarjetas de Crédito** presentan la tasa promedio más alta del portafolio, pero al mismo tiempo exhiben el menor capital colocado. Este patrón es consistente con un producto de mayor rendimiento esperado, aunque con una participación más reducida dentro de la cartera total.
 
-Decisiones Estratégicas (Preliminares)
-A partir de esta radiografía, la dirección del banco podría considerar las siguientes acciones:
+3. **Consumo como producto dominante en volumen.**  
+   El producto **Consumo** registra el mayor número de créditos, lo que sugiere una presencia más amplia dentro del mercado objetivo. Su tasa promedio lo ubica como un producto intermedio entre rentabilidad y masividad dentro del portafolio.
 
-- Protección del Activo Crítico: Dado que casi la mitad del dinero está en "Vehículo", cualquier fluctuación en este mercado impactaría fuertemente la solvencia del banco. Se deben mantener políticas de avalúo estrictas.
-- Oportunidad de Expansión en Tarjetas: Existe un margen de rentabilidad muy atractivo en tarjetas. Si la mora lo permite, hay espacio para aumentar el capital colocado en este producto y maximizar los ingresos por intereses.
-- Fidelización en Libranza: Siendo el producto con la tasa más baja (20.94%), la Libranza debe ser utilizada como "producto ancla" para atraer clientes de bajo riesgo que luego puedan migrar a Consumo o Tarjeta.
+A partir de esta radiografía inicial, pueden plantearse algunas implicaciones preliminares para la gestión del negocio:
 
-Este análisis inicial nos muestra una cartera teóricamente rentable, especialmente en el segmento de tarjetas. Sin embargo, la tasa de interés no es utilidad real hasta que el cliente paga.
-El siguiente paso lógico es validar si ese margen del 33% en tarjetas se mantiene o si se ve erosionado por el incumplimiento. Por lo tanto, nuestra próxima consulta se enfocará en el Análisis de Mora y Comportamiento de Pago, para determinar si los productos con mayores tasas son también los que presentan mayores retrasos.
+- La alta concentración del capital en **Vehículo** sugiere la conveniencia de monitorear con atención este segmento, dado su peso relativo dentro de la cartera.
+- En **Tarjetas de Crédito**, la combinación de tasas más altas y baja participación en capital podría abrir espacio para analizar oportunidades de crecimiento, siempre que el comportamiento de pago resulte consistente con ese mayor rendimiento esperado.
+- En **Libranza**, la menor tasa promedio podría interpretarse como parte de una estrategia más conservadora o de menor riesgo relativo, lo que la convertiría en un producto relevante para comparar desempeño frente a otros segmentos.
+
+En conjunto, esta primera etapa ofrece una visión descriptiva de la composición de la cartera y permite contextualizar el análisis posterior. En particular, resulta natural examinar a continuación si los productos con mayores tasas de interés también presentan mayores niveles de retraso en el pago, o si el rendimiento aparente se ve afectado por el comportamiento de mora.
 """)
 
 
