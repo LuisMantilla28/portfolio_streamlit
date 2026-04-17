@@ -220,6 +220,40 @@ df_ingreso  = con.execute(query_ingreso ).df()
 con.close()
 st.dataframe(df_ingreso , use_container_width=True, hide_index=True)
 
+
+# Configuración de estilo profesional
+sns.set_theme(style="whitegrid")
+plt.figure(figsize=(12, 7))
+
+# Aseguramos el orden lógico del riesgo para que la historia fluya
+orden_riesgo = ['Riesgo Bajo', 'Riesgo Medio', 'Riesgo Alto']
+
+# Creamos el gráfico de barras
+ax = sns.barplot(
+    data=df_clientes, 
+    x='categoria_riesgo', 
+    y='mora_historica', 
+    hue='segment',
+    order=orden_riesgo,
+    palette='viridis' # Colores profesionales y legibles
+)
+
+# Añadimos etiquetas de datos sobre las barras para mayor claridad
+for container in ax.containers:
+    ax.bar_label(container, fmt='%.2f', padding=3, fontsize=10, fontweight='bold')
+
+# Títulos y etiquetas con estilo corporativo
+plt.title('La Paradoja del Riesgo: Días de Mora por Segmento y Score', fontsize=16, fontweight='bold', pad=20)
+plt.xlabel('Categoría de Riesgo (Basada en Score)', fontsize=12, labelpad=10)
+plt.ylabel('Promedio Días de Mora', fontsize=12, labelpad=10)
+plt.legend(title='Segmento de Cliente', title_fontsize='11', loc='upper left')
+
+# Limpiamos el diseño eliminando bordes innecesarios
+sns.despine(left=True, bottom=True)
+
+plt.tight_layout()
+plt.show()
+
 st.write("""
 Al observar la tabla completa, emergen tres descubrimientos que redefinirán la estrategia del banco:
 
