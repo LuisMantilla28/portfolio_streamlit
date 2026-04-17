@@ -181,6 +181,75 @@ Si la mora es similar en todos los productos, ¿quiénes son realmente los clien
 
 
 
+st.subheader("Fase 3. El Mito del Ingreso vs. La Realidad del Score")
+st.write("""
+ingresos, menor es el riesgo de impago. Sin embargo, para un analista de datos, las suposiciones deben validarse con evidencia. En esta fase, cruzamos la información demográfica de los clientes con su historial real de pagos. categorizamos a los clientes en tres niveles de riesgo (Bajo, Medio y Alto) basándonos en su risk_score y comparamos su ingreso promedio frente a su mora histórica (promedio de días de retraso).
+""")
+
+query_ingreso = """
+WITH AnalisisPerfil AS (
+    SELECT 
+        c.customer_id,
+        c.segment,
+        c.risk_score,
+        c.income_monthly,
+        AVG(p.days_late) AS mora_media_cliente
+    FROM customers c
+    JOIN payments p ON c.customer_id = p.customer_id
+    GROUP BY 1, 2, 3, 4
+)
+SELECT 
+    segment,
+    CASE 
+        WHEN risk_score < 500 THEN 'Riesgo Alto'
+        WHEN risk_score < 700 THEN 'Riesgo Medio'
+        ELSE 'Riesgo Bajo'
+    END AS categoria_riesgo,
+    ROUND(AVG(income_monthly), 0) AS ingreso_promedio,
+    ROUND(AVG(mora_media_cliente), 2) AS mora_historica
+FROM AnalisisPerfil
+GROUP BY 1, 2
+ORDER BY 1, 4 DESC;
+"""
+
+st.markdown("### Consulta SQL")
+st.code(query_ingreso , language="sql")
+
+con = duckdb.connect(DB_PATH, read_only=True)
+df_ingreso  = con.execute(query_ingreso ).df()
+con.close()
+st.dataframe(df_ingreso , use_container_width=True, hide_index=True)
+
+st.write("""
+Al observar la tabla completa, emergen tres descubrimientos que redefinirán la estrategia del banco:
+
+1. El "Gran Ecualizador": El Score de Riesgo:
+    - Cuando un cliente tiene Riesgo Bajo (Score > 700), el nivel de ingresos es irrelevante para su puntualidad. Los tres segmentos (SME, Mass y Affluent) se comportan de forma impecable, con moras mínimas entre 0.87 y 1.03 días. La disciplina financiera es universal y no depende del tamaño de la cuenta bancaria.
+2. La Alerta Roja: SME y Mass en Riesgo Alto:
+    - Existe un empate técnico en la peor mora del banco: los clientes de Riesgo Alto en el segmento SME (4.13 días) y Mass (4.12 días).
+    - Lo preocupante: Una SME gana en promedio 1,989, casi 5 veces más que un cliente masivo (439), y aun así tiene la misma mora. Esto indica que el flujo de caja de un pequeño negocio puede ser tan inestable como el de una persona de bajos recursos si no hay una gestión de riesgo sólida.
+3. El Efecto "Colchón" del Segmento Affluent:
+    - En los grupos de Riesgo Alto, el segmento Affluent (2.08 días) tiene la mitad de mora que el segmento Mass (4.12 días). Aquí se demuestra que, ante un mal hábito crediticio, el alto ingreso (2,361 vs 439) ayuda a "tapar" el problema o resolverlo más rápido, pero no lo elimina.
+
+Decisiones Estratégicas (Basadas en Hallazgos)
+
+- Revisión de Política para SME: Los datos muestran que las SME con score bajo son de altísimo peligro. Se recomienda endurecer los requisitos de garantías para negocios con scores menores a 500, ya que su capacidad de pago es tan errática como la del mercado masivo.
+- Fidelización del "Cliente Diamante": Los clientes de Riesgo Bajo en todos los segmentos (moras < 1 día) son los activos más valiosos. Se propone crear un programa de beneficios o tasas preferenciales para asegurar que no migren a la competencia.
+- Segmentación de Cobranza: El equipo de cobranza debe priorizar al grupo SME/Mass de Riesgo Alto, ya que son los que más tardan en regularizar su situación (más de 4 días de retraso promedio).
+
+Hemos confirmado que el Score de Riesgo es el predictor de comportamiento más potente, pero también hemos visto que incluso en segmentos de altos ingresos hay personas que fallan.
+
+Esto nos lleva a una pregunta de detección temprana: Antes de que un cliente de Riesgo Alto llegue a esos 4 días de mora, ¿existen señales en su comportamiento diario?
+""")
+
+
+
+
+
+
+
+
+
 st.markdown("---")
 
 st.subheader("Modelo relacional del dataset")
