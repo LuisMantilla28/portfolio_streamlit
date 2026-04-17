@@ -377,6 +377,109 @@ La pregunta final para cerrar esta estrategia de negocio es: ¿Cómo crecemos ah
 En el paso final de este informe, identificaremos al 'Golden Target': clientes que hoy son sumamente activos en transacciones, tienen ingresos sólidos y un riesgo bajo, pero que extrañamente no poseen ningún préstamo con nosotros. Ellos son la clave para sanear la cartera y maximizar la rentabilidad sin aumentar el riesgo.
 """)
 
+st.subheader("Fase 5. Conclusión y Estrategia: El Segmento "Golden Target"")
+st.write("""
+Tras identificar los focos de riesgo y los patrones de comportamiento de los clientes morosos, la última etapa de este análisis se enfoca en la expansión rentable. El objetivo es detectar a los clientes 'invisibles' para el área de crédito: personas que utilizan activamente el banco, pero que aún no poseen préstamos. Mediante el uso de CTEs y JOINS de exclusión, filtramos a los clientes con scores superiores a 600 y actividad transaccional constante para proponer una estrategia de colocación de bajo riesgo.
+
+Al intentar buscar clientes con scores perfectos (>750) y sin deudas, descubrimos que NovaBank tiene una penetración de mercado tan alta que casi todos nuestros clientes premium ya tienen un crédito con nosotros. Esto es una excelente noticia para el equipo de ventas, pero un reto para el crecimiento.
+
+Por ello, decidimos ajustar nuestra búsqueda hacia el 'Top de Oportunidad': clientes con scores superiores a 600 y actividad constante. Estos no son 'diamantes puros', pero son clientes sólidos que están usando el banco para sus gastos diarios y que representan nuestra mejor oportunidad de expansión inmediata sin comprometer la salud de la cartera.
+""")
+
+query_alerta = """
+WITH PerfilPuntualidad AS (
+    SELECT 
+        customer_id,
+        CASE WHEN AVG(days_late) > 7 THEN 'Moroso' ELSE 'Puntual' END AS estado_cliente
+    FROM payments
+    GROUP BY customer_id
+)
+SELECT 
+    pp.estado_cliente,
+    t.tx_type,
+    COUNT(t.tx_id) AS volumen_transacciones,
+    ROUND(AVG(t.amount), 2) AS monto_promedio_tx
+FROM transactions t
+JOIN PerfilPuntualidad pp ON t.customer_id = pp.customer_id
+GROUP BY 1, 2
+ORDER BY 1, 3 DESC;
+"""
+
+st.markdown("### Consulta SQL")
+st.code(query_alerta , language="sql")
+
+con = duckdb.connect(DB_PATH, read_only=True)
+df_alerta  = con.execute(query_alerta ).df()
+con.close()
+st.dataframe(df_alerta , use_container_width=True, hide_index=True)
+
+
+# Configuración de estilo
+sns.set_theme(style="white")
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 7))
+
+# --- Gráfico 1: Volumen de Transacciones ---
+# Usamos escala logarítmica para que las barras de los morosos sean visibles 
+# y se note la diferencia de magnitud.
+sns.barplot(
+    data=df_alerta, 
+    x='tx_type', 
+    y='volumen_transacciones', 
+    hue='estado_cliente', 
+    ax=ax1,
+    palette='magma'
+)
+ax1.set_yscale("log") # Escala logarítmica para ver la diferencia de miles vs decenas
+ax1.set_title('Frecuencia de Uso por Canal (Escala Log)', fontsize=14, fontweight='bold')
+ax1.set_xlabel('Tipo de Transacción')
+ax1.set_ylabel('Número de Transacciones (Log)')
+
+# --- Gráfico 2: Monto Promedio por Transacción ---
+sns.barplot(
+    data=df_alerta, 
+    x='tx_type', 
+    y='monto_promedio_tx', 
+    hue='estado_cliente', 
+    ax=ax2,
+    palette='magma'
+)
+ax2.set_title('Ticket Promedio: Puntuales vs Morosos', fontsize=14, fontweight='bold')
+ax2.set_xlabel('Tipo de Transacción')
+ax2.set_ylabel('Monto Promedio ($)')
+
+# Añadir etiquetas de datos en el gráfico de montos
+for container in ax2.containers:
+    ax2.bar_label(container, fmt='%.0f', padding=3, fontsize=9)
+
+plt.suptitle('Análisis del "Desierto Transaccional" en Clientes con Mora', fontsize=18, fontweight='bold', y=1.02)
+plt.tight_layout()
+plt.show()
+st.pyplot(plt)
+
+st.write("""
+Al comparar ambos grupos, los datos revelan una diferencia drástica y reveladora en el estilo de vida financiero:
+1. El "Abandono del Ecosistema Digital":
+    - Los clientes Puntuales utilizan todo el abanico de servicios, destacando montos altos en BillPay (826.00) y Transfer (747.03).
+    - Por el contrario, en el grupo Moroso, el uso de BillPay es inexistente (0) y las transferencias son mínimas. Esto sugiere que cuando un cliente empieza a fallar en sus créditos, lo primero que hace es dejar de usar el banco para pagar sus servicios básicos, rompiendo el vínculo digital con la entidad.
+2. Diferencia Crítica en la Capacidad de Gasto:
+    - Existe una brecha enorme en los montos. Mientras un cliente puntual gasta en promedio 201.93 en una compra POS (comercio), el cliente moroso solo gasta 78.67.
+    - Esto indica que el cliente moroso no solo está fallando en su crédito, sino que su capacidad de consumo diario se ha reducido a menos de la tercera parte, una señal clara de estrés financiero profundo.
+3. La "Fuga" hacia el Efectivo:
+    - Aunque el volumen es bajo, el grupo moroso mantiene actividad en ATM (Cajeros) y POS. Esto demuestra que el poco flujo de caja que poseen lo destinan a gastos de supervivencia inmediata (efectivo y compras físicas pequeñas), alejándose de los canales de ahorro o pagos programados.
+
+Decisiones Estratégicas (Alertas Tempranas)
+
+- Indicador de Alerta "BillPay Zero": Se propone crear un evento automático: si un cliente que solía pagar sus facturas (BillPay) deja de hacerlo por 30 días, el sistema debe etiquetarlo como "Riesgo Emergente", incluso antes de que falle en su primera cuota de préstamo.
+- Reducción Proactiva de Riesgo: Para clientes que muestren una caída drástica en su ticket promedio de POS (de >200 a <80), el banco debería bloquear preventivamente los aumentos de cupo en tarjetas de crédito.
+- Campaña de Retención Digital: Ofrecer incentivos para el uso de canales digitales a clientes en riesgo para mantener la visibilidad de su flujo de caja y evitar que se vuelvan "invisibles" al operar solo en efectivo.
+
+Hemos completado el ciclo: sabemos qué productos son rentables, quiénes tienen peor score, y cómo se comportan transaccionalmente cuando están en problemas.
+
+La pregunta final para cerrar esta estrategia de negocio es: ¿Cómo crecemos ahora de forma segura?
+
+En el paso final de este informe, identificaremos al 'Golden Target': clientes que hoy son sumamente activos en transacciones, tienen ingresos sólidos y un riesgo bajo, pero que extrañamente no poseen ningún préstamo con nosotros. Ellos son la clave para sanear la cartera y maximizar la rentabilidad sin aumentar el riesgo.
+""")
+
 
 
 
