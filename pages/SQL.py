@@ -231,7 +231,7 @@ orden_riesgo = ['Riesgo Bajo', 'Riesgo Medio', 'Riesgo Alto']
 
 # Creamos el gráfico de barras
 ax = sns.barplot(
-    data=df_clientes, 
+    data=df_ingreso, 
     x='categoria_riesgo', 
     y='mora_historica', 
     hue='segment',
