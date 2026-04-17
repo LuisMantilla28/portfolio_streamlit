@@ -319,7 +319,7 @@ fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 7))
 # Usamos escala logarítmica para que las barras de los morosos sean visibles 
 # y se note la diferencia de magnitud.
 sns.barplot(
-    data=df_clientes, 
+    data=df_alerta, 
     x='tx_type', 
     y='volumen_transacciones', 
     hue='estado_cliente', 
