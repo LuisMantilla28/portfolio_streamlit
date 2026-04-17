@@ -333,7 +333,7 @@ ax1.set_ylabel('Número de Transacciones (Log)')
 
 # --- Gráfico 2: Monto Promedio por Transacción ---
 sns.barplot(
-    data=df_clientes, 
+    data=df_alerta, 
     x='tx_type', 
     y='monto_promedio_tx', 
     hue='estado_cliente', 
