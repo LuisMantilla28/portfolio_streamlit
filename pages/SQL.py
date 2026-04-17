@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 import streamlit as st
+import seaborn as sns
 
 DB_PATH="data/banking_risk.duckdb"
 navigation.show()
