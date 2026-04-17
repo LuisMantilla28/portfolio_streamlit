@@ -164,20 +164,24 @@ con.close()
 st.dataframe(df_mora, use_container_width=True, hide_index=True)
 
 st.write("""
-Al analizar los resultados, observamos un patrón de riesgo consistente pero con matices importantes:
+A partir de los resultados, se observan algunos patrones de interés en el comportamiento de pago por producto:
 
-1. Confirmación del Perfil de Riesgo en Tarjetas: Como se sospechaba, la Tarjeta de Crédito lidera tanto el promedio de retraso (2.76 días) como el índice de mora (13.76%). Esto justifica que sea el producto con la tasa más alta; el banco cobra más porque, efectivamente, es donde los clientes fallan más.
-2. Estabilidad de la Libranza: El producto Libranza presenta el mejor comportamiento de pago (mora del 12.95% y solo 2.52 días de retraso). Esto es coherente con la naturaleza del producto, donde las cuotas suelen descontarse directamente de la nómina del cliente, reduciendo la probabilidad de olvido o desvío de fondos.
-3. Homogeneidad en la Mora: Un hallazgo sorprendente es la poca dispersión entre productos. La diferencia entre el producto más riesgoso (Tarjeta) y el más seguro (Libranza) es de apenas 0.81 puntos porcentuales en el índice de mora. Esto sugiere que el riesgo de impago en NovaBank está más influenciado por el perfil del cliente que por el tipo de préstamo en sí.
+1. **Tarjetas de Crédito como el producto con mayor mora relativa.**  
+   Dentro de los productos analizados, **Tarjeta de Crédito** registra tanto el mayor promedio de días de retraso como el mayor índice de mora. Esto resulta consistente con la idea de que se trata de un producto con mayor riesgo relativo dentro del portafolio.
 
-Decisiones Estratégicas Basadas en la Mora
+2. **Libranza como el producto con mejor comportamiento de pago.**  
+   **Libranza** presenta los niveles más bajos tanto en mora como en días promedio de retraso. Este resultado es coherente con la naturaleza del producto, en la medida en que los mecanismos de pago asociados suelen favorecer un mayor cumplimiento.
 
-- Optimización de Cobranzas en Tarjetas: Dado que el 13.7% de las cuotas de tarjetas entran en mora, se recomienda implementar recordatorios preventivos (SMS/Email) 3 días antes del vencimiento para este producto específico.
-- Margen de Maniobra en Vehículos: A pesar de tener cuotas mucho más altas en dinero (como vimos en la Fase 1), los clientes de Vehículo son casi tan cumplidos como los de Consumo (13.49% de mora). El banco puede estar tranquilo con su exposición en este sector, ya que la garantía real parece incentivar el pago oportuno.
+3. **Diferencias acotadas entre productos.**  
+   Aunque existen variaciones en los indicadores, la dispersión entre productos no es particularmente amplia. Esto sugiere que, al menos en esta muestra, el tipo de producto por sí solo no parece explicar completamente las diferencias observadas en mora.
 
-Hemos confirmado que las tarjetas son el producto más riesgoso, pero la diferencia con los demás productos es pequeña. Esto nos plantea una nueva e inquietante pregunta:
+A partir de estos hallazgos, pueden plantearse algunas implicaciones preliminares:
 
-Si la mora es similar en todos los productos, ¿quiénes son realmente los clientes que no pagan? ¿Son las personas con ingresos bajos las que tienen más dificultades, o existe una paradoja de riesgo donde clientes con altos ingresos también presentan moras altas debido a su score crediticio?
+- En **Tarjetas de Crédito**, los mayores niveles de mora sugieren la conveniencia de evaluar medidas preventivas de seguimiento o recordatorio de pago, especialmente si este patrón se mantiene en muestras más amplias o en datos reales.
+- En **Vehículo**, el comportamiento de mora no parece diferir de forma marcada frente a otros productos, a pesar de su mayor peso en capital dentro de la cartera. Esto lo convierte en un segmento relevante para monitorear conjuntamente desde la perspectiva de exposición y calidad de pago.
+- En términos generales, la relativa cercanía entre los indicadores de mora por producto sugiere que puede ser útil complementar este análisis con variables asociadas al perfil del cliente.
+
+En conjunto, esta fase sugiere que, aunque **Tarjeta de Crédito** concentra el mayor nivel de riesgo observado entre los productos, las diferencias no son lo suficientemente amplias como para atribuir el comportamiento de pago únicamente al tipo de préstamo. Esto motiva un análisis más detallado del perfil de los clientes, en particular de variables como ingreso y score de riesgo, para evaluar cuál de ellas parece estar más asociada con la mora observada.
 """)
 
 
