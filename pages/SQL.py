@@ -137,14 +137,21 @@ Una tasa de interés alta es atractiva solo si el cliente paga a tiempo. En esta
 """)
 
 query_mora = """
+WITH DetalleMora AS (
+    SELECT 
+        l.product,
+        p.days_late,
+        CASE WHEN p.days_late > 0 THEN 1 ELSE 0 END AS es_pago_tardio
+    FROM loans l
+    JOIN payments p ON l.loan_id = p.loan_id
+)
 SELECT 
     product,
-    COUNT(loan_id) AS total_creditos,
-    SUM(amount) AS capital_colocado,
-    ROUND(AVG(interest_rate) * 100, 2) AS tasa_promedio_ea
-FROM loans
-GROUP BY product
-ORDER BY capital_colocado DESC;
+    ROUND(AVG(days_late), 2) AS promedio_dias_retraso,
+    SUM(es_pago_tardio) * 100.0 / COUNT(*) AS indice_mora_cuotas
+FROM DetalleMora
+GROUP BY 1
+ORDER BY promedio_dias_retraso DESC;
 """
 
 st.markdown("### Consulta SQL")
