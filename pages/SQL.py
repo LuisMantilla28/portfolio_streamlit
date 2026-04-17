@@ -13,12 +13,11 @@ layout="wide"
 
 st.title("SQL para Riesgo Bancario: Analítica Estratégica para Decisiones de Negocio")
 st.markdown("""
-Esta sección presenta un proyecto de analítica aplicada al riesgo bancario desarrollado con **SQL, DuckDB y visualización de datos**, con el propósito de convertir información operativa en decisiones estratégicas. La data utilizada en este caso fue generada a partir de una simulación propia, cuyo código puede consultarse en [este repositorio de GitHub](https://github.com/LuisMantilla28/portfolio_streamlit/blob/cb9e647f0872bc61642a9abd746525ca663ef5f3/Notebooks/Generador_data.ipynb). A partir de un ecosistema financiero sintético que integra clientes, préstamos, pagos y transacciones, el análisis se estructura como una historia de negocio que conecta **rentabilidad, calidad de cartera, comportamiento de pago y oportunidades comerciales**.
+Esta sección presenta un proyecto de analítica aplicada al riesgo bancario desarrollado con **SQL, DuckDB y visualización de datos**. A partir de una base de datos financiera sintética, generada mediante una simulación propia, se construye un caso de análisis enfocado en la composición de la cartera, el comportamiento de pago de los clientes y la identificación de oportunidades comerciales. El código utilizado para generar los datos puede consultarse en [este repositorio de GitHub](https://github.com/LuisMantilla28/portfolio_streamlit/blob/cb9e647f0872bc61642a9abd746525ca663ef5f3/Notebooks/Generador_data.ipynb).
 
-Más allá de describir métricas aisladas, la página busca mostrar una capacidad clave para roles en **riesgo, analítica y finanzas cuantitativas**: construir consultas que permitan diagnosticar el portafolio, detectar patrones relevantes y traducir hallazgos en recomendaciones accionables. El recorrido analítico parte de la composición de la cartera y su exposición por producto, profundiza en los indicadores de mora y en la relación entre ingreso y perfil de riesgo, incorpora señales tempranas desde el comportamiento transaccional y culmina con la identificación de un segmento objetivo de alto valor comercial.
+La página está diseñada como una demostración de portafolio para roles en **riesgo, analítica y finanzas cuantitativas**, y busca mostrar cómo SQL puede utilizarse no solo para consultar información, sino también para estructurar preguntas de negocio, analizar patrones relevantes y comunicar resultados de manera clara. El recorrido incluye el análisis de la exposición por producto, los indicadores de mora, la relación entre ingreso y perfil de riesgo, el comportamiento transaccional y la identificación de clientes con potencial comercial.
 
-En conjunto, esta página funciona como una demostración de portafolio orientada a entornos financieros reales, donde el uso de SQL no se limita a extraer datos, sino que se convierte en una herramienta para **entender el negocio, explicar el riesgo y apoyar la toma de decisiones basada en evidencia**.
-""")
+En conjunto, el proyecto ilustra una aplicación práctica de analítica sobre datos relacionales en un contexto financiero, con énfasis en la interpretación de resultados y su posible utilidad para la toma de decisiones.""")
 
 st.markdown("---")
 
@@ -109,10 +108,6 @@ st.code(query_radiografia, language="sql")
 con = duckdb.connect(DB_PATH, read_only=True)
 df_radiografia = con.execute(query_radiografia).df()
 con.close()
-col1, col2, col3 = st.columns(3)
-col1.metric("Capital Total", f"${df_radiografia['capital_colocado'].sum():,.0f}")
-col2.metric("Tasa Promedio", f"{df_radiografia['tasa_promedio_ea'].mean():.2f}%")
-col3.metric("Total Créditos", f"{df_radiografia['total_creditos'].sum():,}")
 st.dataframe(df_radiografia, use_container_width=True, hide_index=True)
 
 
