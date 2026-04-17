@@ -44,7 +44,7 @@ def show():
             st.switch_page("pages/SQL.py")
 
         if st.button("📈 Series de tiempo"):
-            st.write("Próximamente")
+            st.switch_page("pages/multivariado.py")
 
         if st.button("💰 Modelado financiero"):
             st.write("Próximamente")
