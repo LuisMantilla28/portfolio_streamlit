@@ -295,6 +295,32 @@ fig_corr.update_layout(
 
 st.plotly_chart(fig_corr, use_container_width=True)
 
+
+st.write(
+    """
+    La matriz de correlaciones muestra la dependencia lineal entre los **cambios mensuales**
+    de los factores de riesgo utilizados en la modelación. En general, se observa una relación
+    positiva relativamente fuerte entre **DTF e IBR** (\(\\rho \\approx 0.78\)), lo que sugiere
+    que ambos factores tienden a moverse en la misma dirección y responden a dinámicas
+    similares dentro del sistema. También se identifican correlaciones positivas de magnitud
+    intermedia entre **DTF e IPC** (\(\\rho \\approx 0.50\)), **DTF y TA\\_Jur**
+    (\(\\rho \\approx 0.54\)) e **IBR y TA\\_Jur** (\(\\rho \\approx 0.61\)), lo que indica
+    que estos factores comparten cierta co-movilidad, aunque menos intensa que la observada
+    entre DTF e IBR.
+
+    Por otro lado, las variables **Cuvr** y **Auvr** presentan correlaciones bajas con la
+    mayoría de los demás factores, lo que sugiere una dinámica más independiente dentro del
+    sistema. En particular, **Cuvr** muestra relaciones prácticamente nulas con IPC, Auvr y
+    TA\\_Jur, mientras que **Auvr** también exhibe asociaciones débiles con el resto de las
+    variables. En conjunto, esta estructura indica que el sistema no se mueve de forma
+    homogénea: existe un bloque de factores con dependencia más marcada —principalmente DTF,
+    IBR y TA\\_Jur— y otros componentes cuya evolución parece responder a mecanismos más
+    específicos. Esta evidencia justifica el uso de un enfoque multivariado, ya que permite
+    capturar tanto la co-movilidad entre ciertos factores como la relativa independencia de otros.
+    """
+)
+
+
 st.subheader("Metodología")
 
 st.write(
