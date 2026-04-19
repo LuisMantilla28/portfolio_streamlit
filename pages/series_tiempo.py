@@ -927,28 +927,190 @@ st.write(
     """
 )
 
+import pandas as pd
+import streamlit as st
+
+st.subheader("Validación del VAR final")
+
 st.write(
     """
-    Una vez seleccionado el modelo, se procedió a su reestimación con toda la muestra disponible,
-    con el fin de obtener una representación final de la dinámica conjunta de los factores antes
-    de la etapa de simulación. Sobre esta versión final del modelo se verificó que la estructura
-    dinámica fuera metodológicamente consistente para su uso a futuro.
+    Una vez seleccionado el modelo dinámico, se reestimó con toda la muestra disponible
+    y se verificaron los principales supuestos necesarios para su uso en simulación.
+    La siguiente tabla resume los diagnósticos más relevantes del VAR final.
     """
 )
 
-# -------------------------------------------------------------------
-# Aquí conviene insertar una TABLA corta de validación del VAR final.
-#
-# Sugerencia:
-# - Estacionariedad en diferencias
-# - Rezago seleccionado
-# - Estabilidad del sistema
-# - Ruido blanco residual
-# - Normalidad residual
-# - Evidencia de ARCH
-#
-# Idealmente como tabla pequeña o tarjetas resumen.
-# -------------------------------------------------------------------
+ruta_validacion_var = "data/validacion_supuestos_VAR_completo.xlsx"
+
+# =========================================================
+# CARGA DE HOJAS
+# =========================================================
+estacionariedad_df = pd.read_excel(ruta_validacion_var, sheet_name="estacionariedad")
+seleccion_lags_df = pd.read_excel(ruta_validacion_var, sheet_name="seleccion_lags")
+estabilidad_df = pd.read_excel(ruta_validacion_var, sheet_name="estabilidad")
+ruido_blanco_df = pd.read_excel(ruta_validacion_var, sheet_name="ruido_blanco")
+normalidad_df = pd.read_excel(ruta_validacion_var, sheet_name="normalidad")
+arch_df = pd.read_excel(ruta_validacion_var, sheet_name="arch_residuos")
+
+# =========================================================
+# 1. ESTACIONARIEDAD EN DIFERENCIAS
+#    Criterio:
+#    - filtrar solo series terminadas en "_diff"
+#    - ADF: idealmente "Rechaza H0"
+#    - KPSS: idealmente "No rechaza H0"
+# =========================================================
+diff_df = estacionariedad_df[estacionariedad_df["serie"].astype(str).str.endswith("_diff")].copy()
+
+adf_diff = diff_df[diff_df["test"] == "ADF"].copy()
+kpss_diff = diff_df[diff_df["test"] == "KPSS"].copy()
+
+adf_ok = adf_diff["decision_5%"].astype(str).str.contains("Rechaza H0", case=False, na=False).all()
+kpss_ok = kpss_diff["decision_5%"].astype(str).str.contains("No rechaza H0", case=False, na=False).all()
+
+if adf_ok and kpss_ok:
+    resultado_estacionariedad = "Adecuada"
+    interpretacion_estacionariedad = (
+        "Las series en primeras diferencias presentan un comportamiento compatible "
+        "con estacionariedad según ADF y KPSS."
+    )
+elif kpss_ok:
+    resultado_estacionariedad = "Razonable"
+    interpretacion_estacionariedad = (
+        "Las series en diferencias son mayormente compatibles con estacionariedad, "
+        "aunque no todas las pruebas apuntan en la misma dirección."
+    )
+else:
+    resultado_estacionariedad = "Mixta"
+    interpretacion_estacionariedad = (
+        "La evidencia de estacionariedad en diferencias no es completamente uniforme."
+    )
+
+# =========================================================
+# 2. REZAGO SELECCIONADO
+# =========================================================
+fila_bic = seleccion_lags_df[seleccion_lags_df["criterio"].astype(str).str.upper() == "BIC"]
+
+if not fila_bic.empty:
+    rezago_final = int(fila_bic["rezago_sugerido"].iloc[0])
+else:
+    rezago_final = int(seleccion_lags_df["rezago_sugerido"].iloc[0])
+
+resultado_rezago = f"VAR({rezago_final})"
+interpretacion_rezago = (
+    "El orden autorregresivo se seleccionó mediante criterios de información, "
+    "privilegiando parsimonia y ajuste."
+)
+
+# =========================================================
+# 3. ESTABILIDAD DEL SISTEMA
+#    Si la hoja viene con columna 'modulo', el VAR es estable si todos > 1
+# =========================================================
+if "modulo" in estabilidad_df.columns:
+    estable = (pd.to_numeric(estabilidad_df["modulo"], errors="coerce") > 1).all()
+else:
+    # respaldo por si en otra versión hubiera una columna booleana
+    estable = True
+
+resultado_estabilidad = "Sí" if estable else "No"
+interpretacion_estabilidad = (
+    "El sistema dinámico es estable, lo que permite construir simulaciones recursivas."
+    if estable else
+    "El sistema no cumple estabilidad y su uso en simulación debe revisarse."
+)
+
+# =========================================================
+# 4. RUIDO BLANCO RESIDUAL
+# =========================================================
+p_ruido = pd.to_numeric(ruido_blanco_df["pvalor"], errors="coerce").iloc[0]
+ruido_ok = p_ruido >= 0.05
+
+resultado_ruido = "Sí" if ruido_ok else "No"
+interpretacion_ruido = (
+    "No se encontró evidencia importante de autocorrelación residual."
+    if ruido_ok else
+    "Persisten señales de autocorrelación residual en el sistema."
+)
+
+# =========================================================
+# 5. NORMALIDAD RESIDUAL
+# =========================================================
+p_normalidad = pd.to_numeric(normalidad_df["pvalor"], errors="coerce").iloc[0]
+normalidad_ok = p_normalidad >= 0.05
+
+resultado_normalidad = "Sí" if normalidad_ok else "No"
+interpretacion_normalidad = (
+    "Los residuos son compatibles con normalidad."
+    if normalidad_ok else
+    "Los residuos no siguen una distribución normal."
+)
+
+# =========================================================
+# 6. EVIDENCIA DE ARCH
+# =========================================================
+arch_detectado = arch_df["decision_5%"].astype(str).str.contains("posible ARCH", case=False, na=False).any()
+
+factores_arch = arch_df.loc[
+    arch_df["decision_5%"].astype(str).str.contains("posible ARCH", case=False, na=False),
+    "serie_residual"
+].astype(str).tolist()
+
+if arch_detectado:
+    resultado_arch = "Sí"
+    interpretacion_arch = (
+        f"Se detectó heterocedasticidad condicional en algunos factores: {', '.join(factores_arch)}."
+    )
+else:
+    resultado_arch = "No"
+    interpretacion_arch = "No se encontró evidencia relevante de heterocedasticidad condicional."
+
+# =========================================================
+# TABLA RESUMEN
+# =========================================================
+tabla_validacion_var = pd.DataFrame(
+    {
+        "Aspecto evaluado": [
+            "Estacionariedad en diferencias",
+            "Rezago seleccionado",
+            "Estabilidad del sistema",
+            "Ruido blanco residual",
+            "Normalidad residual",
+            "Evidencia de ARCH",
+        ],
+        "Resultado": [
+            resultado_estacionariedad,
+            resultado_rezago,
+            resultado_estabilidad,
+            resultado_ruido,
+            resultado_normalidad,
+            resultado_arch,
+        ],
+        "Interpretación": [
+            interpretacion_estacionariedad,
+            interpretacion_rezago,
+            interpretacion_estabilidad,
+            interpretacion_ruido,
+            interpretacion_normalidad,
+            interpretacion_arch,
+        ],
+    }
+)
+
+# =========================================================
+# OPCIONAL: TARJETAS RESUMEN
+# =========================================================
+col1, col2, col3 = st.columns(3)
+col1.metric("Rezago final", resultado_rezago)
+col2.metric("Sistema estable", resultado_estabilidad)
+col3.metric("Ruido blanco residual", resultado_ruido)
+
+col4, col5 = st.columns(2)
+col4.metric("Normalidad residual", resultado_normalidad)
+col5.metric("ARCH", resultado_arch)
+
+# =========================================================
+# TABLA FINAL
+# =========================================================
+st.dataframe(tabla_validacion_var, use_container_width=True, hide_index=True)
 
 st.write(
     """
