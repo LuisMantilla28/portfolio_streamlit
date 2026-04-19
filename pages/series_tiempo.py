@@ -30,15 +30,21 @@ st.title("Generación de Escenarios Multivariados y Simulación de Factores de R
 
 st.write(
     """
+st.write(
+    """
     Este proyecto desarrolla un framework robusto para la modelación estocástica de factores 
     de riesgo mensuales. El enfoque principal es la construcción de un motor de simulación 
     capaz de proyectar la dinámica conjunta de variables macroeconómicas y tasas de interés, 
-    sirviendo como el insumo crítico (input) para modelos de riesgo estructural de balance.
+    sirviendo como el insumo crítico (input) para modelos de riesgo estructural de balance. 
+    Puedes consultar el desarrollo técnico detallado, las pruebas estadísticas y el código de entrenamiento 
+    en el siguiente **[Jupyter Notebook de GitHub](https://github.com/LuisMantilla28/portfolio_streamlit/blob/b97e5a719df55a3d71b07979ac99b1a1fac7917a/Notebooks/serie_tiempo_multivariadas.ipynb)**.
 
     A través de una comparación rigurosa de metodologías de series de tiempo, el sistema 
     identifica el modelo con mayor capacidad predictiva mediante validación temporal 
     fuera de muestra, garantizando que las trayectorias generadas respeten tanto la 
     autocorrelación de las series como su interdependencia contemporánea.
+    """
+)
     """
 )
 
