@@ -923,22 +923,12 @@ st.write(
     """
     La elección de un único rezago fue coherente con los criterios de información utilizados y
     sugiere que la memoria útil del sistema es relativamente corta, pero suficientemente informativa
-    como para mejorar frente a enfoques más simples.
-    """
-)
-
-import pandas as pd
-import streamlit as st
-
-st.subheader("Validación del VAR final")
-
-st.write(
-    """
-    Una vez seleccionado el modelo dinámico, se reestimó con toda la muestra disponible
+    como para mejorar frente a enfoques más simples.Una vez seleccionado el modelo dinámico, se reestimó con toda la muestra disponible
     y se verificaron los principales supuestos necesarios para su uso en simulación.
     La siguiente tabla resume los diagnósticos más relevantes del VAR final.
     """
 )
+
 
 ruta_validacion_var = "data/validacion_supuestos_VAR_completo.xlsx"
 
@@ -1128,16 +1118,235 @@ st.write(
     """
 )
 
-# -------------------------------------------------------------------
-# Aquí conviene insertar una GRÁFICA de trayectorias simuladas.
-#
-# Sugerencia:
-# - selector de factor
-# - serie histórica observada
-# - múltiples trayectorias simuladas a 12 meses
-# - mediana simulada
-# - banda percentílica (por ejemplo 5%-95%)
-# -------------------------------------------------------------------
+
+# =========================================================
+# CONFIGURACIÓN
+# =========================================================
+RUTA_FACTORES = Path("data/Factores de Riesgo.xlsx")
+RUTA_ESCENARIOS = Path("data/simulacion_VAR_bootstrap/escenarios_VAR_bootstrap_long.parquet")
+RUTA_PERCENTILES = Path("data/simulacion_VAR_bootstrap/resumen_percentiles_VAR_bootstrap.xlsx")
+
+FACTOR_COLS = ["DTF", "IBR", "IPC", "Cuvr", "Auvr", "TA_Jur"]
+
+
+# =========================================================
+# FUNCIONES AUXILIARES
+# =========================================================
+def convertir_fecha_excel(serie):
+    s = serie.copy()
+
+    if pd.api.types.is_datetime64_any_dtype(s):
+        return pd.to_datetime(s, errors="coerce")
+
+    s_num = pd.to_numeric(s, errors="coerce")
+    if s_num.notna().sum() > 0:
+        return pd.to_datetime(s_num, unit="D", origin="1899-12-30", errors="coerce")
+
+    return pd.to_datetime(s, errors="coerce")
+
+
+@st.cache_data
+def cargar_historico(ruta_factores):
+    df = pd.read_excel(ruta_factores)
+    df = df.loc[:, ~df.columns.astype(str).str.contains(r"^Unnamed")]
+
+    fecha_col = None
+    for c in df.columns:
+        if str(c).strip().lower() == "fecha":
+            fecha_col = c
+            break
+
+    if fecha_col is not None:
+        df[fecha_col] = convertir_fecha_excel(df[fecha_col])
+        df = df.sort_values(fecha_col).reset_index(drop=True)
+        df = df.rename(columns={fecha_col: "Fecha"})
+    else:
+        df.insert(0, "Fecha", pd.RangeIndex(start=1, stop=len(df) + 1))
+
+    for col in FACTOR_COLS:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    df = df[["Fecha"] + FACTOR_COLS].dropna().reset_index(drop=True)
+    return df
+
+
+@st.cache_data
+def cargar_escenarios(ruta_escenarios):
+    return pd.read_parquet(ruta_escenarios)
+
+
+@st.cache_data
+def cargar_percentiles(ruta_percentiles):
+    return pd.read_excel(ruta_percentiles)
+
+
+# =========================================================
+# CARGA DE DATOS
+# =========================================================
+historico_df = cargar_historico(RUTA_FACTORES)
+escenarios_long = cargar_escenarios(RUTA_ESCENARIOS)
+percentiles_df = cargar_percentiles(RUTA_PERCENTILES)
+
+
+# =========================================================
+# SECCIÓN STREAMLIT
+# =========================================================
+st.subheader("Trayectorias simuladas de los factores de riesgo")
+
+st.write(
+    """
+    La siguiente visualización muestra la serie histórica observada junto con las trayectorias
+    simuladas a 12 meses obtenidas a partir del modelo VAR(1) con bootstrap de residuos
+    vectoriales. Además, se incluye la mediana simulada y una banda percentílica 5%-95%.
+    """
+)
+
+col1, col2 = st.columns([2, 1])
+
+with col1:
+    factor_sim = st.selectbox(
+        "Seleccione un factor",
+        FACTOR_COLS,
+        index=0,
+        key="selector_trayectorias_simuladas"
+    )
+
+with col2:
+    n_trayectorias = st.slider(
+        "Número de trayectorias a mostrar",
+        min_value=20,
+        max_value=200,
+        value=100,
+        step=10,
+        key="slider_num_trayectorias"
+    )
+
+# =========================================================
+# PREPARAR FECHAS FUTURAS
+# =========================================================
+if "fecha_futura" in escenarios_long.columns:
+    fechas_futuras = pd.to_datetime(escenarios_long["fecha_futura"], errors="coerce")
+    escenarios_long = escenarios_long.copy()
+    escenarios_long["fecha_futura"] = fechas_futuras
+else:
+    ultima_fecha = historico_df["Fecha"].iloc[-1]
+    horizonte_max = int(escenarios_long["horizonte"].max())
+
+    if isinstance(ultima_fecha, pd.Timestamp):
+        fechas_map = pd.date_range(
+            start=ultima_fecha + pd.offsets.MonthEnd(1),
+            periods=horizonte_max,
+            freq="M"
+        )
+    else:
+        fechas_map = list(range(len(historico_df) + 1, len(historico_df) + horizonte_max + 1))
+
+    mapa_horizonte_fecha = {h + 1: fechas_map[h] for h in range(horizonte_max)}
+    escenarios_long = escenarios_long.copy()
+    escenarios_long["fecha_futura"] = escenarios_long["horizonte"].map(mapa_horizonte_fecha)
+
+# =========================================================
+# SUBMUESTRA DE TRAYECTORIAS PARA VISUALIZACIÓN
+# =========================================================
+escenarios_ids = np.sort(escenarios_long["escenario"].unique())
+rng = np.random.default_rng(123)
+n_mostrar = min(n_trayectorias, len(escenarios_ids))
+escenarios_mostrar = rng.choice(escenarios_ids, size=n_mostrar, replace=False)
+
+escenarios_plot = escenarios_long[escenarios_long["escenario"].isin(escenarios_mostrar)].copy()
+escenarios_plot = escenarios_plot.sort_values(["escenario", "horizonte"])
+
+# =========================================================
+# PERCENTILES DEL FACTOR SELECCIONADO
+# =========================================================
+percentiles_factor = percentiles_df[percentiles_df["factor"] == factor_sim].copy()
+percentiles_factor["fecha_futura"] = pd.to_datetime(percentiles_factor["fecha_futura"], errors="coerce")
+percentiles_factor = percentiles_factor.sort_values("horizonte")
+
+# =========================================================
+# GRÁFICA
+# =========================================================
+fig = go.Figure()
+
+# Serie histórica observada
+fig.add_trace(
+    go.Scatter(
+        x=historico_df["Fecha"],
+        y=historico_df[factor_sim],
+        mode="lines",
+        name="Histórico",
+        line=dict(width=3)
+    )
+)
+
+# Trayectorias simuladas
+for i, esc in enumerate(escenarios_mostrar):
+    sub = escenarios_plot[escenarios_plot["escenario"] == esc]
+
+    fig.add_trace(
+        go.Scatter(
+            x=sub["fecha_futura"],
+            y=sub[factor_sim],
+            mode="lines",
+            name="Trayectorias simuladas" if i == 0 else None,
+            showlegend=(i == 0),
+            opacity=0.15,
+            line=dict(width=1)
+        )
+    )
+
+# Banda percentílica 5%-95%
+fig.add_trace(
+    go.Scatter(
+        x=percentiles_factor["fecha_futura"],
+        y=percentiles_factor["p95"],
+        mode="lines",
+        line=dict(width=0),
+        showlegend=False,
+        hoverinfo="skip"
+    )
+)
+
+fig.add_trace(
+    go.Scatter(
+        x=percentiles_factor["fecha_futura"],
+        y=percentiles_factor["p5"],
+        mode="lines",
+        fill="tonexty",
+        name="Banda 5%-95%",
+        line=dict(width=0),
+        hoverinfo="skip"
+    )
+)
+
+# Mediana simulada
+fig.add_trace(
+    go.Scatter(
+        x=percentiles_factor["fecha_futura"],
+        y=percentiles_factor["p50"],
+        mode="lines",
+        name="Mediana simulada",
+        line=dict(dash="dash", width=3)
+    )
+)
+
+# Línea de corte historia / simulación
+fig.add_vline(
+    x=historico_df["Fecha"].iloc[-1],
+    line_dash="dot",
+    line_width=1
+)
+
+fig.update_layout(
+    title=f"{factor_sim}: histórico y trayectorias simuladas a 12 meses",
+    xaxis_title="Fecha",
+    yaxis_title=factor_sim,
+    height=600,
+    legend_title="Serie"
+)
+
+st.plotly_chart(fig, use_container_width=True)
 
 st.write(
     """
