@@ -300,7 +300,7 @@ st.write(
     """
     La matriz de correlaciones muestra la dependencia lineal entre los **cambios mensuales**
     de los factores de riesgo utilizados en la modelación. En general, se observa una relación
-    positiva relativamente fuerte entre **DTF e IBR** ( $\rho \approx 0.78$ ), lo que sugiere
+    positiva relativamente fuerte entre **DTF e IBR** ( $\\rho = 0.78$ ), lo que sugiere
     que ambos factores tienden a moverse en la misma dirección y responden a dinámicas
     similares dentro del sistema. También se identifican correlaciones positivas de magnitud
     intermedia entre **DTF e IPC** (\(\\rho \\approx 0.50\)), **DTF y TA\\_Jur**
