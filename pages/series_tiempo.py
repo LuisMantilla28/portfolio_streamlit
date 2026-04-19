@@ -25,18 +25,20 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("Factores de riesgo y simulación de EaR")
+# Título actualizado
+st.title("Generación de Escenarios Multivariados y Simulación de Factores de Riesgo")
 
 st.write(
     """
-    Caso de estudio de modelación de factores de riesgo mensuales para la generación
-    de escenarios y su posterior uso en la estimación del Net Interest Income (NII)
-    y del Earnings at Risk (EaR).
+    Este proyecto desarrolla un framework robusto para la modelación estocástica de factores 
+    de riesgo mensuales. El enfoque principal es la construcción de un motor de simulación 
+    capaz de proyectar la dinámica conjunta de variables macroeconómicas y tasas de interés, 
+    sirviendo como el insumo crítico (input) para modelos de riesgo estructural de balance.
 
-    En este proyecto se comparan distintas metodologías de series de tiempo bajo
-    validación temporal fuera de muestra, con el fin de seleccionar un modelo capaz
-    de representar adecuadamente la dinámica conjunta de los factores de riesgo y
-    generar trayectorias futuras consistentes para análisis financiero.
+    A través de una comparación rigurosa de metodologías de series de tiempo, el sistema 
+    identifica el modelo con mayor capacidad predictiva mediante validación temporal 
+    fuera de muestra, garantizando que las trayectorias generadas respeten tanto la 
+    autocorrelación de las series como su interdependencia contemporánea.
     """
 )
 
@@ -44,27 +46,27 @@ st.subheader("Objetivos del proyecto")
 
 st.write(
     """
-    Este proyecto tiene como objetivo modelar la dinámica conjunta de varios factores
-    de riesgo mensuales con el fin de generar escenarios futuros consistentes para
-    análisis de riesgo financiero.
+    El objetivo central es diseñar un motor de proyecciones que elimine la subjetividad 
+    en la construcción de escenarios financieros, sustituyendo supuestos arbitrarios por 
+    una metodología cuantitativa defendible y estadísticamente validada.
 
-    Desde la perspectiva de negocio, el problema consiste en evitar que la proyección
-    de variables relevantes para el balance se haga de forma arbitraria o con supuestos
-    poco defendibles. En su lugar, se busca construir una metodología cuantitativa que
-    permita representar la evolución probable de los factores de riesgo y trasladar esa
-    incertidumbre al comportamiento futuro del Net Interest Income (NII) y del
-    Earnings at Risk (EaR).
+    Este módulo se encarga de la primera fase del análisis de riesgo: la transformación de 
+    datos históricos en distribuciones de probabilidad de trayectorias futuras.
 
-    En particular, los objetivos específicos fueron:
+    **Los objetivos específicos son:**
 
-    - Comparar distintas metodologías de predicción y simulación de series de tiempo;
-    - Evaluar su desempeño mediante validación temporal fuera de muestra;
-    - Seleccionar el modelo más adecuado para representar la dependencia conjunta de los factores;
-    - Generar trayectorias futuras a 12 meses que puedan utilizarse como insumo
-      en ejercicios de simulación financiera y medición de riesgo.
+    - **Evaluación Comparativa:** Contrastar modelos de persistencia (Benchmark), modelos 
+      estáticos (Normal Multivariada) y modelos dinámicos (VAR) para capturar la estructura 
+      de las series.
+    - **Validación Robusta:** Implementar un esquema de *rolling validation* expansivo para 
+      medir el desempeño predictivo real de cada metodología.
+    - **Captura de Dependencias:** Modelar la interacción conjunta de los factores para 
+      asegurar que los escenarios sean consistentes entre sí (ej. relación entre IPC e IBR).
+    - **Simulación Estocástica:** Generar un abanico de trayectorias futuras a 12 meses 
+      utilizando técnicas de *Bootstrap* de residuos vectoriales, permitiendo capturar 
+      riesgos de cola sin asumir normalidad en las perturbaciones.
     """
 )
-
 st.subheader("Descripción de los datos")
 
 st.write(
