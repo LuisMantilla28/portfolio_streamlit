@@ -261,6 +261,43 @@ with tab3:
     st.dataframe(factores_df, use_container_width=True)
 
 
+
+st.subheader("Matriz de correlaciones de los datos modelados")
+
+st.write(
+    """
+    La siguiente matriz resume la dependencia lineal entre los factores de riesgo
+    utilizados en la modelación. En este caso, la correlación se calculó sobre las
+    **primeras diferencias** de las series, es decir, sobre los datos efectivamente
+    utilizados en el modelo dinámico.
+    """
+)
+
+ruta_corr = "data/matriz_correlacion_modelada.csv"
+
+matriz_corr = pd.read_csv(ruta_corr, index_col=0)
+
+# Mostrar tabla numérica
+st.write("**Tabla de correlaciones**")
+st.dataframe(matriz_corr.round(3), use_container_width=True)
+
+# Heatmap interactivo
+fig_corr = px.imshow(
+    matriz_corr,
+    text_auto=".2f",
+    aspect="auto",
+    labels=dict(color="Correlación"),
+    title="Heatmap de correlaciones"
+)
+
+fig_corr.update_layout(
+    height=600,
+    xaxis_title="Factor",
+    yaxis_title="Factor"
+)
+
+st.plotly_chart(fig_corr, use_container_width=True)
+
 st.subheader("Metodología")
 
 st.write(
