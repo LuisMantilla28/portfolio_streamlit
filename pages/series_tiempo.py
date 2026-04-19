@@ -1288,3 +1288,42 @@ st.write(
     aplicación en ejercicios de NII y EaR.
     """
 )
+
+
+st.subheader("Conclusiones: Resiliencia del Modelo ante Crisis Globales")
+
+st.write(
+    """
+    El análisis de los 148 meses de datos, cuya serie culmina en **abril de 2020**, sitúa a este modelo 
+    en un punto de inflexión histórico. El cierre de la muestra coincide con el inicio de la 
+    crisis económica global derivada de la pandemia de COVID-19, un periodo caracterizado por 
+    una volatilidad sin precedentes y una ruptura de las tendencias estructurales en las tasas 
+    de interés e inflación.
+
+    A través de este ejercicio, se derivan tres conclusiones fundamentales:
+
+    1. **Superioridad de la Dinámica Multivariada:** En momentos de alta incertidumbre como los 
+       vividos en el primer trimestre de 2020, los modelos estáticos y los benchmarks ingenuos 
+       pierden capacidad de reacción. El modelo **VAR(1)** demostró ser la herramienta más robusta 
+       al capturar no solo la inercia individual de los factores, sino también cómo el shock en 
+       una variable (ej. IPC o IBR) se propaga dinámicamente al resto del sistema financiero.
+
+    2. **Bootstrap como Herramienta de Stress-Testing:** La decisión de utilizar un esquema de 
+       **Bootstrap de residuos vectoriales** en lugar de una distribución normal fue crítica. 
+       Dado que los mercados financieros en abril de 2020 presentaron "colas pesadas" (eventos 
+       extremos de baja probabilidad pero alto impacto), el bootstrap permitió generar escenarios 
+       que capturan esa anomalía histórica, proporcionando una base mucho más realista para 
+       ejercicios de *Stress-Testing*.
+
+    3. **Valor Estratégico para el NII y EaR:** La generación de estas 1,000 trayectorias no es 
+       solo un ejercicio estadístico; es la base para la supervivencia financiera. En el contexto 
+       de 2020, contar con un motor de escenarios que reconozca la correlación entre factores 
+       permite a la tesorería anticipar el deterioro del **Net Interest Income (NII)** y cuantificar 
+       el **Earnings at Risk (EaR)** bajo condiciones de mercado estresadas.
+
+    **En conclusión:** Este framework no solo modela datos; construye una infraestructura de 
+    previsión que permite a las organizaciones transitar de una gestión de riesgos reactiva a una 
+    **estrategia proactiva basada en evidencia**, incluso cuando el entorno macroeconómico 
+    enfrenta cambios de paradigma como los de la crisis del 2020.
+    """
+)
