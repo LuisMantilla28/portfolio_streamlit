@@ -8,6 +8,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 import os
+from plotly.subplots import make_subplots
+import streamlit as st
+
 
 navigation.show()
 layout="wide"
