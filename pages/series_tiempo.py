@@ -547,14 +547,34 @@ st.write(
     """
 )
 
-# -------------------------------------------------------------------
-# Aquí conviene insertar una TABLA resumen con RMSE y MAE por modelo
-# y por factor.
-#
-# Sugerencia:
-# - una tabla compacta con columnas:
-#   factor | RMSE benchmark | RMSE normal | RMSE VAR | MAE benchmark | MAE normal | MAE VAR
-# -------------------------------------------------------------------
+import pandas as pd
+import streamlit as st
+
+st.subheader("Tabla resumen de métricas por modelo")
+
+ruta_tabla_modelos = "data/tabla_resumen_modelos.csv"
+
+tabla_modelos = pd.read_csv(ruta_tabla_modelos)
+
+# Renombrar columnas para presentación
+tabla_modelos = tabla_modelos.rename(columns={
+    "factor": "Factor",
+    "RMSE_benchmark": "RMSE Benchmark",
+    "RMSE_normal": "RMSE Normal",
+    "RMSE_VAR": "RMSE VAR",
+    "MAE_benchmark": "MAE Benchmark",
+    "MAE_normal": "MAE Normal",
+    "MAE_VAR": "MAE VAR"
+})
+
+# Redondear para que la tabla se vea más limpia
+columnas_metricas = [
+    "RMSE Benchmark", "RMSE Normal", "RMSE VAR",
+    "MAE Benchmark", "MAE Normal", "MAE VAR"
+]
+tabla_modelos[columnas_metricas] = tabla_modelos[columnas_metricas].round(6)
+
+st.dataframe(tabla_modelos, use_container_width=True, hide_index=True)
 
 st.write(
     """
