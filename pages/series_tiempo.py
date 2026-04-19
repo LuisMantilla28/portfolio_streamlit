@@ -596,14 +596,90 @@ st.write(
     """
 )
 
-# -------------------------------------------------------------------
-# Aquí conviene insertar una GRÁFICA comparativa de métricas.
-#
-# Sugerencia:
-# - barras agrupadas por factor
-# - color por modelo
-# - una gráfica para RMSE y otra para MAE, o un selector para alternar
-# -------------------------------------------------------------------
+import pandas as pd
+import plotly.express as px
+import streamlit as st
+
+st.subheader("Comparación de métricas por modelo")
+
+st.write(
+    """
+    La siguiente visualización permite comparar el desempeño de los modelos
+    evaluados para cada factor de riesgo, utilizando las métricas RMSE y MAE.
+    """
+)
+
+# =========================================================
+# CARGA DE DATOS
+# =========================================================
+ruta_tabla_modelos = "data/tabla_resumen_modelos.csv"
+tabla_modelos = pd.read_csv(ruta_tabla_modelos)
+
+# =========================================================
+# SELECTOR DE MÉTRICA
+# =========================================================
+metrica = st.radio(
+    "Seleccione la métrica a visualizar:",
+    ["RMSE", "MAE"],
+    horizontal=True
+)
+
+# =========================================================
+# PREPARAR DATOS EN FORMATO LARGO
+# =========================================================
+if metrica == "RMSE":
+    df_plot = tabla_modelos[["factor", "RMSE_benchmark", "RMSE_normal", "RMSE_VAR"]].copy()
+    df_plot = df_plot.rename(columns={
+        "RMSE_benchmark": "Benchmark ingenuo",
+        "RMSE_normal": "Normal multivariada",
+        "RMSE_VAR": "VAR"
+    })
+else:
+    df_plot = tabla_modelos[["factor", "MAE_benchmark", "MAE_normal", "MAE_VAR"]].copy()
+    df_plot = df_plot.rename(columns={
+        "MAE_benchmark": "Benchmark ingenuo",
+        "MAE_normal": "Normal multivariada",
+        "MAE_VAR": "VAR"
+    })
+
+df_plot = df_plot.melt(
+    id_vars="factor",
+    var_name="Modelo",
+    value_name="Valor"
+)
+
+# Dejar GLOBAL al final si existe
+orden_factores = [f for f in tabla_modelos["factor"].tolist() if f != "GLOBAL"]
+if "GLOBAL" in tabla_modelos["factor"].values:
+    orden_factores.append("GLOBAL")
+
+df_plot["factor"] = pd.Categorical(df_plot["factor"], categories=orden_factores, ordered=True)
+df_plot = df_plot.sort_values("factor")
+
+# =========================================================
+# GRÁFICA
+# =========================================================
+fig = px.bar(
+    df_plot,
+    x="factor",
+    y="Valor",
+    color="Modelo",
+    barmode="group",
+    title=f"Comparación de {metrica} por factor y modelo",
+    labels={
+        "factor": "Factor",
+        "Valor": metrica
+    }
+)
+
+fig.update_layout(
+    xaxis_title="Factor",
+    yaxis_title=metrica,
+    legend_title="Modelo",
+    height=550
+)
+
+st.plotly_chart(fig, use_container_width=True)
 
 st.write(
     """
