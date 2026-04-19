@@ -188,7 +188,8 @@ with tab1:
     factor_seleccionado = st.selectbox(
         "Seleccione un factor",
         FACTOR_COLS,
-        index=0
+        index=0,
+    key="select_factor_historico"
     )
 
     fig_individual = px.line(
