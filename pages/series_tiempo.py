@@ -970,14 +970,13 @@ kpss_ok = kpss_diff["decision_5%"].astype(str).str.contains("No rechaza H0", cas
 if adf_ok and kpss_ok:
     resultado_estacionariedad = "Adecuada"
     interpretacion_estacionariedad = (
-        "Las series en primeras diferencias presentan un comportamiento compatible "
-        "con estacionariedad según ADF y KPSS."
+        "Las series en primeras diferencias presentan un comportamiento compatible."
+
     )
 elif kpss_ok:
     resultado_estacionariedad = "Razonable"
     interpretacion_estacionariedad = (
-        "Las series en diferencias son mayormente compatibles con estacionariedad, "
-        "aunque no todas las pruebas apuntan en la misma dirección."
+        "Las series en diferencias son mayormente compatibles con estacionariedad."
     )
 else:
     resultado_estacionariedad = "Mixta"
@@ -997,8 +996,7 @@ else:
 
 resultado_rezago = f"VAR({rezago_final})"
 interpretacion_rezago = (
-    "El orden autorregresivo se seleccionó mediante criterios de información, "
-    "privilegiando parsimonia y ajuste."
+    "El orden autorregresivo se seleccionó mediante criterios de información."
 )
 
 # =========================================================
