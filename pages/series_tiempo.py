@@ -277,9 +277,6 @@ ruta_corr = "data/matriz_correlacion_modelada.csv"
 
 matriz_corr = pd.read_csv(ruta_corr, index_col=0)
 
-# Mostrar tabla numérica
-st.write("**Tabla de correlaciones**")
-st.dataframe(matriz_corr.round(3), use_container_width=True)
 
 # Heatmap interactivo
 fig_corr = px.imshow(
