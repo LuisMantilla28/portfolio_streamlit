@@ -524,156 +524,179 @@ with st.expander("11. Aplicación en riesgo financiero"):
         **NII** y del **EaR**.
         """
     )
+
 st.subheader("Resultados")
 
 st.write(
     """
-    La comparación entre metodologías permitió identificar diferencias claras en la
-    capacidad predictiva de los modelos evaluados. En particular, se analizaron tres
-    enfoques: benchmark ingenuo, normal multivariada y VAR.
+    La etapa de validación permitió comparar de manera consistente tres enfoques de modelación:
+    **benchmark ingenuo**, **normal multivariada** y **VAR**, todos evaluados bajo un esquema
+    de validación rolling expansiva. El objetivo de esta comparación fue identificar cuál de
+    estas metodologías representaba de forma más adecuada la dinámica de los factores de riesgo
+    y ofrecía una base sólida para la generación posterior de escenarios.
     """
 )
 
-with st.expander("1. Comparación general de modelos", expanded=True):
-    st.write(
-        """
-        La validación rolling expansiva mostró que el **benchmark ingenuo** era un
-        competidor fuerte, lo cual sugiere una alta persistencia en niveles para varios
-        de los factores. Esto fue importante porque permitió establecer una línea base
-        exigente para la comparación.
-        """
-    )
+st.write(
+    """
+    Desde una perspectiva general, el **benchmark ingenuo** resultó ser una referencia exigente,
+    lo que sugiere una alta persistencia en niveles para varios de los factores. Este hallazgo
+    fue importante porque permitió evaluar si los modelos más estructurados realmente aportaban
+    capacidad predictiva adicional o si, por el contrario, reproducían un comportamiento muy
+    cercano al de una regla simple de persistencia.
+    """
+)
 
-    st.write(
-        """
-        El modelo de **normal multivariada** no logró mejorar de forma sistemática al
-        benchmark. Aunque su formulación conjunta resulta útil como aproximación inicial,
-        su estructura estática no fue suficiente para capturar adecuadamente la dinámica
-        temporal de los factores de riesgo.
-        """
-    )
+# -------------------------------------------------------------------
+# Aquí conviene insertar una TABLA resumen con RMSE y MAE por modelo
+# y por factor.
+#
+# Sugerencia:
+# - una tabla compacta con columnas:
+#   factor | RMSE benchmark | RMSE normal | RMSE VAR | MAE benchmark | MAE normal | MAE VAR
+# -------------------------------------------------------------------
 
-    st.write(
-        """
-        El modelo **VAR** fue el que presentó el mejor desempeño global en términos de
-        error predictivo fuera de muestra. Su ventaja frente al benchmark ingenuo fue
-        moderada, pero consistente, y además superó al enfoque normal multivariado en la
-        mayoría de los factores.
-        """
-    )
+st.write(
+    """
+    En este contexto, el modelo de **normal multivariada** no mostró mejoras sistemáticas frente
+    al benchmark. Aunque su formulación conjunta resulta útil como aproximación inicial y como
+    referencia metodológica, su estructura esencialmente estática no fue suficiente para capturar
+    de forma adecuada la dependencia temporal de los factores. En la práctica, este enfoque terminó
+    produciendo predicciones muy cercanas a una extrapolación simple del último valor observado.
+    """
+)
 
-with st.expander("2. Lectura por factor"):
-    st.write(
-        """
-        El desempeño del modelo VAR no fue uniforme en todos los factores, pero sí mostró
-        mejoras particularmente visibles en variables como **DTF, IBR, IPC y Cuvr**.
-        """
-    )
+st.write(
+    """
+    Por su parte, el **modelo VAR** presentó el mejor desempeño global en términos de error
+    predictivo fuera de muestra. Su principal fortaleza radica en que incorpora de manera explícita
+    tanto la dependencia temporal de cada factor como la interacción dinámica entre ellos, lo que le
+    permite capturar una estructura conjunta más rica que la ofrecida por los otros enfoques
+    comparados.
+    """
+)
 
-    st.write(
-        """
-        En algunos factores, como **Auvr** y **TA_Jur**, las diferencias entre modelos
-        fueron más pequeñas, lo que sugiere que la ganancia predictiva del VAR es más
-        clara en ciertas dinámicas que en otras.
-        """
-    )
+# -------------------------------------------------------------------
+# Aquí conviene insertar una GRÁFICA comparativa de métricas.
+#
+# Sugerencia:
+# - barras agrupadas por factor
+# - color por modelo
+# - una gráfica para RMSE y otra para MAE, o un selector para alternar
+# -------------------------------------------------------------------
 
-    st.write(
-        """
-        A pesar de ello, el VAR mantuvo el mejor desempeño agregado y ofreció una
-        representación más rica de la dependencia temporal y de la interacción entre
-        factores que los otros enfoques comparados.
-        """
-    )
+st.write(
+    """
+    A nivel individual, la ganancia del VAR no fue uniforme en todos los factores, pero sí mostró
+    mejoras particularmente visibles en variables como **DTF, IBR, IPC y Cuvr**. En otros factores,
+    como **Auvr** y **TA_Jur**, las diferencias entre metodologías fueron más moderadas, lo cual
+    sugiere que la utilidad de la estructura dinámica varía según la naturaleza de cada serie.
+    """
+)
 
-with st.expander("3. Selección del modelo final"):
-    st.write(
-        """
-        A partir de la comparación fuera de muestra, el modelo seleccionado como base
-        para la simulación final fue un:
-        """
-    )
+st.write(
+    """
+    En términos metodológicos, estos resultados permiten distinguir tres niveles de complejidad:
+    una referencia base representada por el benchmark ingenuo, una aproximación conjunta pero
+    estática representada por la normal multivariada, y una formulación dinámica multivariada
+    representada por el VAR. Esta jerarquía fue útil para justificar la transición desde modelos
+    simples hasta una estrategia más adecuada para simulación.
+    """
+)
 
-    st.latex(r"""
-    \boxed{\text{VAR}(1)}
-    """)
+# -------------------------------------------------------------------
+# Aquí conviene insertar una GRÁFICA de series reales vs predichas.
+#
+# Sugerencia:
+# - selector de factor
+# - línea real
+# - línea benchmark
+# - línea normal multivariada
+# - línea VAR
+#
+# Esta visual ayuda mucho a mostrar por qué la normal multivariada
+# se comporta como una versión casi desplazada de la serie real,
+# mientras que el VAR logra capturar mejor ciertos movimientos.
+# -------------------------------------------------------------------
 
-    st.write(
-        """
-        La selección del orden autorregresivo fue consistente con los criterios de
-        información utilizados, los cuales coincidieron en escoger un único rezago.
-        Esto sugiere que la dinámica relevante del sistema es relativamente corta,
-        pero lo suficientemente informativa como para mejorar frente a modelos más simples.
-        """
-    )
+st.write(
+    """
+    A partir de la evidencia obtenida en la validación fuera de muestra, el modelo seleccionado
+    como base para la simulación final fue un:
+    """
+)
 
-with st.expander("4. Validación del VAR final"):
-    st.write(
-        """
-        Una vez reestimado el VAR(1) con toda la muestra, se verificó que la estructura
-        dinámica del sistema fuera metodológicamente defendible para su uso en simulación.
-        """
-    )
+st.latex(r"""
+\boxed{\text{VAR}(1)}
+""")
 
-    st.write(
-        """
-        Las pruebas aplicadas mostraron que las series en diferencias eran compatibles con
-        un esquema de modelación estacionaria y que el sistema estimado era **estable**,
-        lo cual es una condición esencial para generar trayectorias recursivas a varios pasos.
-        """
-    )
+st.write(
+    """
+    La elección de un único rezago fue coherente con los criterios de información utilizados y
+    sugiere que la memoria útil del sistema es relativamente corta, pero suficientemente informativa
+    como para mejorar frente a enfoques más simples.
+    """
+)
 
-    st.write(
-        """
-        Adicionalmente, los residuos del modelo no mostraron evidencia importante de
-        autocorrelación remanente, lo que indica que la parte lineal de la dinámica fue
-        capturada razonablemente bien.
-        """
-    )
+st.write(
+    """
+    Una vez seleccionado el modelo, se procedió a su reestimación con toda la muestra disponible,
+    con el fin de obtener una representación final de la dinámica conjunta de los factores antes
+    de la etapa de simulación. Sobre esta versión final del modelo se verificó que la estructura
+    dinámica fuera metodológicamente consistente para su uso a futuro.
+    """
+)
 
-    st.write(
-        """
-        Sin embargo, la validación residual también mostró que los errores del sistema
-        **no seguían una distribución normal** y que en algunos factores existía evidencia
-        de **heterocedasticidad condicional**. Esta observación fue clave para definir
-        la estrategia final de simulación.
-        """
-    )
+# -------------------------------------------------------------------
+# Aquí conviene insertar una TABLA corta de validación del VAR final.
+#
+# Sugerencia:
+# - Estacionariedad en diferencias
+# - Rezago seleccionado
+# - Estabilidad del sistema
+# - Ruido blanco residual
+# - Normalidad residual
+# - Evidencia de ARCH
+#
+# Idealmente como tabla pequeña o tarjetas resumen.
+# -------------------------------------------------------------------
 
-with st.expander("5. Implicación para la simulación de escenarios"):
-    st.write(
-        """
-        Dado que la estructura media del sistema queda bien representada por el VAR(1),
-        este modelo se adoptó como base dinámica para proyectar los factores de riesgo.
-        No obstante, debido a la falta de normalidad residual, la simulación no se apoyó
-        en shocks gaussianos i.i.d.
-        """
-    )
+st.write(
+    """
+    La validación del modelo final mostró que la dinámica media del sistema quedaba razonablemente
+    bien representada por el VAR(1). Sin embargo, el análisis residual indicó que la incertidumbre
+    del sistema no debía tratarse como puramente gaussiana, lo que condujo a adoptar una estrategia
+    de simulación basada en **bootstrap de residuos vectoriales** en lugar de imponer shocks normales
+    i.i.d.
+    """
+)
 
-    st.write(
-        """
-        En su lugar, se utilizó un esquema de **bootstrap de residuos vectoriales**,
-        lo que permite preservar mejor la dependencia contemporánea entre factores y
-        construir trayectorias más coherentes con la evidencia empírica observada.
-        """
-    )
+st.write(
+    """
+    Esta decisión es relevante porque permite preservar mejor la dependencia contemporánea entre
+    factores dentro del término residual y construir trayectorias futuras más coherentes con la
+    evidencia empírica observada en la muestra histórica.
+    """
+)
 
-    st.write(
-        """
-        Con esta estrategia se generaron **1000 trayectorias mensuales a 12 meses** para
-        cada uno de los factores de riesgo, las cuales sirven como insumo para ejercicios
-        posteriores de simulación del balance y cuantificación del EaR.
-        """
-    )
+# -------------------------------------------------------------------
+# Aquí conviene insertar una GRÁFICA de trayectorias simuladas.
+#
+# Sugerencia:
+# - selector de factor
+# - serie histórica observada
+# - múltiples trayectorias simuladas a 12 meses
+# - mediana simulada
+# - banda percentílica (por ejemplo 5%-95%)
+# -------------------------------------------------------------------
 
-with st.expander("6. Conclusión de la etapa de modelación"):
-    st.write(
-        """
-        En conjunto, los resultados muestran que la comparación fuera de muestra permitió
-        pasar de una aproximación estática inicial a una metodología dinámica más adecuada
-        para simulación. La principal conclusión de esta etapa es que el sistema de factores
-        de riesgo puede representarse de forma consistente mediante un **VAR(1)** en
-        primeras diferencias, acompañado por un esquema de **bootstrap de residuos
-        vectoriales** para la generación de escenarios.
-        """
-    )
+st.write(
+    """
+    En síntesis, los resultados de esta etapa muestran que la comparación fuera de muestra permitió
+    pasar de aproximaciones simples o estáticas a una metodología dinámica multivariada más adecuada
+    para la generación de escenarios. La combinación entre un **VAR(1)** en primeras diferencias y
+    un esquema de **bootstrap de residuos vectoriales** constituye, en este proyecto, la base
+    metodológica para la construcción de trayectorias futuras de factores de riesgo y su posterior
+    aplicación en ejercicios de NII y EaR.
+    """
+)
