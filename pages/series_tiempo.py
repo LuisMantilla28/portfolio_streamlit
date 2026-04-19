@@ -700,20 +700,210 @@ st.write(
     """
 )
 
-# -------------------------------------------------------------------
-# Aquí conviene insertar una GRÁFICA de series reales vs predichas.
-#
-# Sugerencia:
-# - selector de factor
-# - línea real
-# - línea benchmark
-# - línea normal multivariada
-# - línea VAR
-#
-# Esta visual ayuda mucho a mostrar por qué la normal multivariada
-# se comporta como una versión casi desplazada de la serie real,
-# mientras que el VAR logra capturar mejor ciertos movimientos.
-# -------------------------------------------------------------------
+# =========================================================
+# CONFIGURACIÓN
+# =========================================================
+RUTA_FACTORES = Path("data/Factores de Riesgo.xlsx")
+RUTA_BENCHMARK = Path("data/resultados_validacion_benchmark.xlsx")
+RUTA_NORMAL = Path("data/resultados_validacion_normal_multivariada.xlsx")
+RUTA_VAR = Path("data/resultados_validacion_VAR.xlsx")
+
+FACTOR_COLS = ["DTF", "IBR", "IPC", "Cuvr", "Auvr", "TA_Jur"]
+
+
+# =========================================================
+# FUNCIONES AUXILIARES
+# =========================================================
+def convertir_fecha_excel(serie):
+    s = serie.copy()
+
+    if pd.api.types.is_datetime64_any_dtype(s):
+        return pd.to_datetime(s, errors="coerce")
+
+    s_num = pd.to_numeric(s, errors="coerce")
+    if s_num.notna().sum() > 0:
+        return pd.to_datetime(s_num, unit="D", origin="1899-12-30", errors="coerce")
+
+    return pd.to_datetime(s, errors="coerce")
+
+
+@st.cache_data
+def cargar_fechas_originales(ruta_factores):
+    df = pd.read_excel(ruta_factores)
+    df = df.loc[:, ~df.columns.astype(str).str.contains(r"^Unnamed")]
+
+    fecha_col = None
+    for c in df.columns:
+        if str(c).strip().lower() == "fecha":
+            fecha_col = c
+            break
+
+    if fecha_col is not None:
+        df[fecha_col] = convertir_fecha_excel(df[fecha_col])
+        df = df.sort_values(fecha_col).reset_index(drop=True)
+        fechas = df[[fecha_col]].copy()
+        fechas = fechas.rename(columns={fecha_col: "Fecha"})
+    else:
+        fechas = pd.DataFrame({"Fecha": range(1, len(df) + 1)})
+
+    fechas["fila_test"] = range(1, len(fechas) + 1)
+    return fechas
+
+
+@st.cache_data
+def cargar_predicciones(ruta_excel):
+    df = pd.read_excel(ruta_excel, sheet_name="predicciones")
+    df = df.loc[:, ~df.columns.astype(str).str.contains(r"^Unnamed")]
+    return df
+
+
+def preparar_df_modelo(df_modelo, factor, nombre_modelo):
+    cols_necesarias = [
+        "fila_test",
+        f"real_level_{factor}",
+        f"pred_level_{factor}",
+    ]
+
+    faltantes = [c for c in cols_necesarias if c not in df_modelo.columns]
+    if faltantes:
+        raise ValueError(f"En {nombre_modelo} faltan columnas: {faltantes}")
+
+    out = df_modelo[cols_necesarias].copy()
+    out = out.rename(columns={
+        f"real_level_{factor}": "Real",
+        f"pred_level_{factor}": nombre_modelo
+    })
+    return out
+
+
+# =========================================================
+# CARGA DE DATOS
+# =========================================================
+st.subheader("Comparación visual de predicciones")
+
+st.write(
+    """
+    La siguiente visualización compara la trayectoria real observada con las
+    predicciones one-step-ahead generadas por los modelos evaluados durante la
+    validación rolling expansiva.
+    """
+)
+
+factor_seleccionado = st.selectbox(
+    "Seleccione un factor",
+    FACTOR_COLS,
+    index=0
+)
+
+fechas_df = cargar_fechas_originales(RUTA_FACTORES)
+
+# Modelo normal
+normal_df_raw = cargar_predicciones(RUTA_NORMAL)
+normal_df = preparar_df_modelo(
+    normal_df_raw,
+    factor=factor_seleccionado,
+    nombre_modelo="Normal multivariada"
+)
+
+# Modelo VAR
+var_df_raw = cargar_predicciones(RUTA_VAR)
+var_df = preparar_df_modelo(
+    var_df_raw,
+    factor=factor_seleccionado,
+    nombre_modelo="VAR"
+)
+
+# Tomamos la serie real desde uno de los archivos y luego unimos el resto
+df_plot = normal_df.copy()
+df_plot = df_plot.merge(
+    var_df[["fila_test", "VAR"]],
+    on="fila_test",
+    how="inner"
+)
+
+# Benchmark: opcional
+benchmark_disponible = RUTA_BENCHMARK.exists()
+if benchmark_disponible:
+    benchmark_df_raw = cargar_predicciones(RUTA_BENCHMARK)
+    benchmark_df = preparar_df_modelo(
+        benchmark_df_raw,
+        factor=factor_seleccionado,
+        nombre_modelo="Benchmark ingenuo"
+    )
+    df_plot = df_plot.merge(
+        benchmark_df[["fila_test", "Benchmark ingenuo"]],
+        on="fila_test",
+        how="inner"
+    )
+
+# Agregar fechas reales
+df_plot = df_plot.merge(fechas_df, on="fila_test", how="left")
+df_plot = df_plot.sort_values("fila_test").reset_index(drop=True)
+
+# Si quieres mostrar solo las 48 observaciones rolling:
+# df_plot = df_plot.tail(48).copy()
+
+# =========================================================
+# GRÁFICA
+# =========================================================
+fig = go.Figure()
+
+fig.add_trace(
+    go.Scatter(
+        x=df_plot["Fecha"],
+        y=df_plot["Real"],
+        mode="lines",
+        name="Real",
+        line=dict(width=3)
+    )
+)
+
+if benchmark_disponible:
+    fig.add_trace(
+        go.Scatter(
+            x=df_plot["Fecha"],
+            y=df_plot["Benchmark ingenuo"],
+            mode="lines",
+            name="Benchmark ingenuo",
+            line=dict(dash="dot", width=2)
+        )
+    )
+
+fig.add_trace(
+    go.Scatter(
+        x=df_plot["Fecha"],
+        y=df_plot["Normal multivariada"],
+        mode="lines",
+        name="Normal multivariada",
+        line=dict(dash="dash", width=2)
+    )
+)
+
+fig.add_trace(
+    go.Scatter(
+        x=df_plot["Fecha"],
+        y=df_plot["VAR"],
+        mode="lines",
+        name="VAR",
+        line=dict(dash="dash", width=2)
+    )
+)
+
+fig.update_layout(
+    title=f"Serie real vs predicciones rolling – {factor_seleccionado}",
+    xaxis_title="Fecha",
+    yaxis_title=factor_seleccionado,
+    height=550,
+    legend_title="Serie"
+)
+
+st.plotly_chart(fig, use_container_width=True)
+
+if not benchmark_disponible:
+    st.info(
+        "No se encontró el archivo 'data/resultados_validacion_benchmark.xlsx'. "
+        "La gráfica se muestra con la serie real, la normal multivariada y el VAR."
+    )
 
 st.write(
     """
