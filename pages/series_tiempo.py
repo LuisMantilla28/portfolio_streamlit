@@ -793,7 +793,8 @@ st.write(
 factor_seleccionado = st.selectbox(
     "Seleccione un factor",
     FACTOR_COLS,
-    index=0
+    index=0,
+    key="select_factor_predicciones"
 )
 
 fechas_df = cargar_fechas_originales(RUTA_FACTORES)
