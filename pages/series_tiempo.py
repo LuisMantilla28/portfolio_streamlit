@@ -28,8 +28,7 @@ st.set_page_config(
 # Título actualizado
 st.title("Generación de Escenarios Multivariados y Simulación de Factores de Riesgo")
 
-st.write(
-    """
+
 st.write(
     """
     Este proyecto desarrolla un framework robusto para la modelación estocástica de factores 
@@ -43,8 +42,6 @@ st.write(
     identifica el modelo con mayor capacidad predictiva mediante validación temporal 
     fuera de muestra, garantizando que las trayectorias generadas respeten tanto la 
     autocorrelación de las series como su interdependencia contemporánea.
-    """
-)
     """
 )
 
