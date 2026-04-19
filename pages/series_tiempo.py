@@ -262,337 +262,265 @@ st.subheader("Metodología")
 
 st.write(
     """
-    El objetivo fue modelar la dinámica conjunta de varios factores de riesgo mensuales
-    para generar escenarios futuros consistentes y utilizarlos posteriormente en ejercicios
-    de simulación financiera, especialmente en la estimación del **Net Interest Income (NII)**
-    y del **Earnings at Risk (EaR)**.
+    El objetivo metodológico de este proyecto fue modelar la dinámica conjunta de
+    varios factores de riesgo mensuales para generar trayectorias futuras consistentes
+    y utilizarlas posteriormente en ejercicios de simulación financiera orientados
+    al **Net Interest Income (NII)** y al **Earnings at Risk (EaR)**.
     """
 )
 
-st.markdown("---")
-
-st.subheader("1. Variables consideradas")
-
-st.write(
-    """
-    Se trabajó con seis factores de riesgo observados mensualmente:
-    **DTF, IBR, IPC, Cuvr, Auvr y TA_Jur**.
-    """
-)
-
-st.latex(r"""
-X_t=
-\begin{pmatrix}
-\text{DTF}_t\\
-\text{IBR}_t\\
-\text{IPC}_t\\
-\text{Cuvr}_t\\
-\text{Auvr}_t\\
-\text{TA\_Jur}_t
-\end{pmatrix},
-\qquad t=1,\dots,148
-""")
-
-st.write(
-    """
-    En total se utilizaron **148 observaciones mensuales**, lo que permitió construir
-    un ejercicio de validación temporal y, posteriormente, estimar el modelo final
-    con toda la muestra.
-    """
-)
-
-st.markdown("---")
-
-st.subheader("2. Transformación de las series")
-
-st.write(
-    """
-    Dado que varios factores en niveles presentaban señales de no estacionariedad o resultados
-    mixtos en las pruebas estadísticas, la modelación se realizó sobre **primeras diferencias**.
-    """
-)
-
-st.latex(r"""
-\Delta X_t = X_t - X_{t-1}
-""")
-
-st.write(
-    """
-    Esta transformación permite trabajar con series más cercanas a la estacionariedad y resulta
-    más adecuada para modelos dinámicos multivariados como el VAR.
-    """
-)
-
-st.markdown("---")
-
-st.subheader("3. Modelos comparados")
-
-st.write(
-    """
-    Se compararon tres enfoques predictivos para determinar cuál representaba mejor la dinámica
-    de los factores de riesgo:
-    """
-)
-
-st.markdown(
-    """
-    - **Benchmark ingenuo**: asume que el siguiente valor es igual al valor actual.
-    - **Normal multivariada**: modela conjuntamente los cambios mensuales con una distribución
-      normal multivariada.
-    - **VAR**: incorpora dependencia temporal e interacción dinámica entre los factores mediante
-      sus rezagos.
-    """
-)
-
-st.write("**Benchmark ingenuo**")
-st.latex(r"""
-\hat X_{t+1} = X_t
-""")
-
-st.write("Equivalentemente, en diferencias:")
-st.latex(r"""
-\widehat{\Delta X}_{t+1}=0
-""")
-
-st.write("**Modelo normal multivariado**")
-st.latex(r"""
-\Delta X_t \sim \mathcal N_k(\mu,\Sigma)
-""")
-
-st.write("El pronóstico puntual a un paso está dado por:")
-st.latex(r"""
-\widehat{\Delta X}_{t+1} = \hat\mu
-""")
-
-st.write("y el nivel pronosticado se reconstruye como:")
-st.latex(r"""
-\hat X_{t+1}=X_t+\hat\mu
-""")
-
-st.write("**Modelo VAR**")
-st.latex(r"""
-\Delta X_t = c + A_1 \Delta X_{t-1} + \cdots + A_p \Delta X_{t-p} + u_t
-""")
-
-st.write(
-    """
-    A diferencia del modelo normal multivariado estático, el VAR permite capturar tanto la
-    dependencia temporal de cada factor como la interacción dinámica entre ellos.
-    """
-)
-
-st.markdown("---")
-
-st.subheader("4. Esquema de validación")
-
-st.write(
-    """
-    Para comparar los modelos se utilizó una estrategia de **validación rolling expansiva**
-    (*expanding window*), respetando el orden temporal de la muestra y evitando el uso de
-    información futura en el entrenamiento.
-    """
-)
-
-st.write(
-    """
-    Se partió de una ventana inicial de 100 observaciones y luego se realizaron predicciones
-    one-step-ahead expandiendo la muestra en cada iteración:
-    """
-)
-
-st.latex(r"""
-\text{Train}_s = \{1,2,\dots,m+s-1\}
-""")
-
-st.latex(r"""
-\text{Test}_s = \{m+s\}
-""")
-
-st.write(
-    """
-    En cada split se ajustó el modelo con la muestra de entrenamiento, se generó una predicción
-    a un paso adelante y se comparó con el valor realmente observado.
-    """
-)
-
-st.markdown("---")
-
-st.subheader("5. Métricas de evaluación")
-
-st.write(
-    """
-    El desempeño predictivo fuera de muestra se evaluó mediante dos métricas:
-    """
-)
-
-st.write("**Raíz del error cuadrático medio (RMSE)**")
-st.latex(r"""
-RMSE = \sqrt{\frac{1}{n}\sum_{t=1}^{n}(X_t-\hat X_t)^2}
-""")
-
-st.write("**Error absoluto medio (MAE)**")
-st.latex(r"""
-MAE = \frac{1}{n}\sum_{t=1}^{n}|X_t-\hat X_t|
-""")
-
-st.write(
-    """
-    Ambas métricas se calcularon por factor y también de forma global para comparar de manera
-    consistente los enfoques propuestos.
-    """
-)
-
-st.markdown("---")
-
-st.subheader("6. Selección del modelo final")
-
-st.write(
-    """
-    Los resultados mostraron que el **benchmark ingenuo** era competitivo, que la
-    **normal multivariada** no mejoraba de forma sistemática al benchmark y que el
-    **modelo VAR** ofrecía el mejor desempeño global.
-    """
-)
-
-st.write(
-    """
-    A partir de esta evidencia, el modelo seleccionado como base para la simulación final fue un:
-    """
-)
-
-st.latex(r"""
-\boxed{\text{VAR}(1)}
-""")
-
-st.write(
-    """
-    El orden del VAR se eligió utilizando criterios de información como AIC, BIC, HQIC y FPE,
-    los cuales coincidieron en seleccionar un rezago igual a uno.
-    """
-)
-
-st.markdown("---")
-
-st.subheader("7. Estimación final y validación del VAR")
-
-st.write(
-    """
-    Una vez escogido el modelo, el VAR(1) se reestimó utilizando toda la muestra disponible.
-    Luego se validaron sus principales supuestos:
-    """
-)
-
-st.markdown(
-    """
-    - estacionariedad de las series en diferencias;
-    - estabilidad del sistema;
-    - ausencia de autocorrelación residual importante;
-    - comportamiento de los residuos en términos de normalidad;
-    - evidencia de heterocedasticidad condicional.
-    """
-)
-
-st.write(
-    """
-    La evidencia empírica mostró que el sistema era estable y que la dinámica media conjunta
-    quedaba razonablemente representada. Sin embargo, los residuos no resultaron gaussianos
-    y, en algunos factores, se encontró evidencia de heterocedasticidad condicional.
-    """
-)
-
-st.markdown("---")
-
-st.subheader("8. Simulación de escenarios")
-
-st.write(
-    """
-    Debido a que los residuos del VAR no cumplían adecuadamente el supuesto de normalidad,
-    la simulación final no se realizó mediante shocks gaussianos i.i.d. En su lugar, se
-    utilizó un enfoque de **bootstrap de residuos vectoriales**.
-    """
-)
-
-st.write("El modelo base para la simulación fue:")
-st.latex(r"""
-\Delta X_t = c + A_1 \Delta X_{t-1} + u_t
-""")
-
-st.write("con residuos estimados:")
-st.latex(r"""
-\hat u_t = \Delta X_t - \widehat{\Delta X}_t
-""")
-
-st.write(
-    """
-    En cada paso de simulación se seleccionó aleatoriamente con reemplazo un residuo vectorial
-    histórico completo, preservando así la dependencia contemporánea entre factores.
-    """
-)
-
-st.write("La simulación recursiva se construyó como:")
-st.latex(r"""
-\Delta X_{T+1}^{(s)} = \hat c + \hat A_1 \Delta X_T + \hat u_{T+1}^{(s)}
-""")
-
-st.latex(r"""
-X_{T+1}^{(s)} = X_T + \Delta X_{T+1}^{(s)}
-""")
-
-st.write("y de forma recursiva para horizontes posteriores:")
-st.latex(r"""
-\Delta X_{T+h}^{(s)} =
-\hat c + \hat A_1 \Delta X_{T+h-1}^{(s)} + \hat u_{T+h}^{(s)},
-\qquad h=1,\dots,12
-""")
-
-st.write(
-    """
-    Este procedimiento se repitió para:
-    """
-)
-
-st.latex(r"""
-s=1,\dots,1000
-""")
-
-st.write(
-    """
-    obteniendo así **1000 trayectorias mensuales a 12 meses** para cada uno de los factores
-    de riesgo.
-    """
-)
-
-st.markdown("---")
-
-st.subheader("9. Aplicación financiera")
-
-st.write(
-    """
-    Las trayectorias simuladas de los factores de riesgo se utilizan posteriormente como
-    insumo del modelo financiero del balance. A partir de ellas se generan trayectorias
-    futuras del NII y, con ello, se cuantifica el **Earnings at Risk (EaR)** bajo múltiples
-    escenarios.
-    """
-)
-
-st.markdown("---")
-
-st.subheader("10. Conclusión metodológica")
-
-st.write(
-    """
-    En síntesis, la estrategia implementada consistió en:
-
-    1. transformar las series a primeras diferencias;
-    2. comparar benchmark ingenuo, normal multivariada y VAR mediante validación rolling expansiva;
-    3. seleccionar el VAR(1) como mejor modelo predictivo;
-    4. reestimarlo con toda la muestra disponible;
-    5. validar su estabilidad y comportamiento residual;
-    6. generar escenarios futuros mediante bootstrap de residuos vectoriales.
-
-    Este enfoque permite combinar validación estadística, modelación dinámica multivariada
-    y simulación empírica de innovaciones, construyendo una base coherente para ejercicios
-    de riesgo financiero orientados a NII y EaR.
-    """
-)
-
+with st.expander("1. Variables consideradas", expanded=True):
+    st.write(
+        """
+        Se trabajó con seis factores de riesgo observados mensualmente:
+        **DTF, IBR, IPC, Cuvr, Auvr y TA_Jur**.
+        """
+    )
+
+    st.latex(r"""
+    X_t=
+    \begin{pmatrix}
+    \text{DTF}_t\\
+    \text{IBR}_t\\
+    \text{IPC}_t\\
+    \text{Cuvr}_t\\
+    \text{Auvr}_t\\
+    \text{TA\_Jur}_t
+    \end{pmatrix},
+    \qquad t=1,\dots,T
+    """)
+
+with st.expander("2. Transformación de las series"):
+    st.write(
+        """
+        La modelación se realizó sobre **primeras diferencias**, con el fin de
+        trabajar con una representación más adecuada para modelos dinámicos multivariados.
+        """
+    )
+
+    st.latex(r"""
+    \Delta X_t = X_t - X_{t-1}
+    """)
+
+    st.write(
+        """
+        Esta transformación permite estudiar los cambios mensuales de cada factor
+        en lugar de trabajar directamente sobre sus niveles.
+        """
+    )
+
+with st.expander("3. Modelos considerados"):
+    st.write("Se plantearon tres enfoques de modelación:")
+
+    st.markdown(
+        """
+        - **Benchmark ingenuo**
+        - **Modelo normal multivariado**
+        - **Modelo VAR**
+        """
+    )
+
+    st.write("**Benchmark ingenuo**")
+    st.latex(r"""
+    \hat X_{t+1}=X_t
+    """)
+
+    st.write("En diferencias:")
+    st.latex(r"""
+    \widehat{\Delta X}_{t+1}=0
+    """)
+
+    st.write("**Modelo normal multivariado**")
+    st.latex(r"""
+    \Delta X_t \sim \mathcal{N}_k(\mu,\Sigma)
+    """)
+
+    st.write("Pronóstico puntual a un paso:")
+    st.latex(r"""
+    \widehat{\Delta X}_{t+1}=\hat\mu
+    """)
+
+    st.write("Reconstrucción en niveles:")
+    st.latex(r"""
+    \hat X_{t+1}=X_t+\hat\mu
+    """)
+
+    st.write("**Modelo VAR**")
+    st.latex(r"""
+    \Delta X_t = c + A_1 \Delta X_{t-1} + \cdots + A_p \Delta X_{t-p} + u_t
+    """)
+
+    st.write(
+        """
+        Este enfoque permite capturar tanto dependencia temporal como interacción
+        dinámica entre los factores.
+        """
+    )
+
+with st.expander("4. Validación temporal"):
+    st.write(
+        """
+        Para comparar los modelos se utilizó una estrategia de **validación rolling expansiva**,
+        respetando el orden temporal de la muestra.
+        """
+    )
+
+    st.latex(r"""
+    \text{Train}_s = \{1,2,\dots,m+s-1\}
+    """)
+
+    st.latex(r"""
+    \text{Test}_s = \{m+s\}
+    """)
+
+    st.write(
+        """
+        En cada iteración se estimó el modelo con la información disponible hasta ese momento,
+        se generó una predicción **one-step-ahead** y se comparó con la observación siguiente.
+        """
+    )
+
+with st.expander("5. Métricas de evaluación"):
+    st.write(
+        """
+        El desempeño predictivo fuera de muestra se evaluó mediante dos métricas:
+        """
+    )
+
+    st.write("**RMSE**")
+    st.latex(r"""
+    RMSE=\sqrt{\frac{1}{n}\sum_{t=1}^{n}(X_t-\hat X_t)^2}
+    """)
+
+    st.write("**MAE**")
+    st.latex(r"""
+    MAE=\frac{1}{n}\sum_{t=1}^{n}|X_t-\hat X_t|
+    """)
+
+with st.expander("6. Estimación final del modelo dinámico"):
+    st.write(
+        """
+        Una vez completada la fase de comparación, el modelo dinámico final se
+        reestimó con toda la muestra disponible.
+        """
+    )
+
+    st.write(
+        """
+        El orden autorregresivo se seleccionó mediante criterios de información,
+        buscando un balance entre ajuste y parsimonia.
+        """
+    )
+
+with st.expander("7. Validación de supuestos del modelo"):
+    st.write(
+        """
+        Sobre el modelo final se revisaron los siguientes aspectos metodológicos:
+        """
+    )
+
+    st.markdown(
+        """
+        - **Estacionariedad** de las series transformadas  
+        - **Estabilidad** del sistema dinámico  
+        - **Autocorrelación residual**  
+        - **Normalidad residual**  
+        - **Heterocedasticidad condicional**
+        """
+    )
+
+    st.write(
+        """
+        Estas verificaciones permiten evaluar si la estructura dinámica estimada
+        es consistente y si la incertidumbre residual puede utilizarse de manera
+        adecuada en la simulación de escenarios.
+        """
+    )
+
+with st.expander("8. Esquema de simulación"):
+    st.write(
+        """
+        La simulación de escenarios se construyó a partir del modelo dinámico estimado
+        y de sus residuos.
+        """
+    )
+
+    st.latex(r"""
+    \Delta X_t = c + A_1 \Delta X_{t-1} + \cdots + A_p \Delta X_{t-p} + u_t
+    """)
+
+    st.write("Residuos estimados:")
+    st.latex(r"""
+    \hat u_t = \Delta X_t - \widehat{\Delta X}_t
+    """)
+
+    st.write(
+        """
+        La actualización en niveles se obtiene a partir de los cambios simulados:
+        """
+    )
+
+    st.latex(r"""
+    X_{t+1}=X_t+\Delta X_{t+1}
+    """)
+
+with st.expander("9. Bootstrap de residuos vectoriales"):
+    st.write(
+        """
+        Para representar la incertidumbre del sistema se utilizó un esquema de
+        **bootstrap de residuos vectoriales**, remuestreando residuos históricos
+        completos del modelo dinámico.
+        """
+    )
+
+    st.write(
+        """
+        Este enfoque preserva la dependencia contemporánea entre factores dentro
+        del término residual.
+        """
+    )
+
+    st.latex(r"""
+    \Delta X_{T+1}^{(s)}=
+    \hat c+\hat A_1 \Delta X_T+\cdots+\hat A_p \Delta X_{T-p+1}+\hat u_{T+1}^{(s)}
+    """)
+
+    st.latex(r"""
+    X_{T+1}^{(s)}=X_T+\Delta X_{T+1}^{(s)}
+    """)
+
+with st.expander("10. Construcción de escenarios"):
+    st.write(
+        """
+        El horizonte de simulación se definió en **12 meses**, y el procedimiento
+        se repitió múltiples veces para generar una colección de trayectorias futuras.
+        """
+    )
+
+    st.latex(r"""
+    s=1,\dots,S
+    """)
+
+    st.write(
+        """
+        Cada escenario contiene la evolución mensual simulada de los seis factores
+        de riesgo y constituye la base para el análisis posterior del balance.
+        """
+    )
+
+with st.expander("11. Aplicación en riesgo financiero"):
+    st.write(
+        """
+        Las trayectorias simuladas de los factores no se interpretan como un único
+        pronóstico puntual, sino como una representación probabilística de posibles
+        estados futuros del sistema.
+        """
+    )
+
+    st.write(
+        """
+        Estas trayectorias se utilizan posteriormente como entrada del modelo financiero
+        del balance para trasladar la incertidumbre de los factores al cálculo del
+        **NII** y del **EaR**.
+        """
+    )
