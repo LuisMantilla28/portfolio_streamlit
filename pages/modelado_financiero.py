@@ -495,6 +495,17 @@ with st.expander("Ver descripción detallada del archivo Balance.xlsx", expanded
                 yaxis_title="Saldo total (billones de COP)"
             )
             st.plotly_chart(fig_tasa_2, use_container_width=True)
+        st.markdown("""
+        En términos estructurales, el balance presenta una **alta concentración en posiciones pasivas**, 
+        explicada principalmente por la **Cuenta de Ahorro Jurídica**, que domina tanto la distribución por 
+        cartera como por factor de tasa a través de **TA_Jur**. Esta concentración también se refleja en la 
+        composición por naturaleza, donde los pasivos representan prácticamente la totalidad del saldo total. 
+        Adicionalmente, el plan de amortización **INTPER** concentra la mayor parte del balance, lo que sugiere 
+        que una fracción importante de las posiciones mantiene el capital hasta el vencimiento y solo genera 
+        pagos periódicos de intereses. En conjunto, esta estructura anticipa una sensibilidad relevante del 
+        margen financiero frente a movimientos en tasas asociadas al fondeo, y ayuda a explicar por qué el 
+        riesgo del balance se encuentra fuertemente concentrado en el libro pasivo.
+        """)
 
     # --------------------------------------------------------
     # TAB 4: BALANCE COMPLETO
