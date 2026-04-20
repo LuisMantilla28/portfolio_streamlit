@@ -1023,6 +1023,39 @@ activas con alta capacidad de generación de ingresos y un bloque de posiciones 
 la mayor parte de la presión sobre el margen financiero.
     """)
 
+st.subheader("Conclusiones")
+
+st.markdown("""
+El ejercicio permitió construir una medición consistente del **riesgo de tasa de interés en el libro bancario**
+a partir de la proyección del **Ingreso Neto por Intereses (NII)** y del cálculo del **Earnings at Risk (EaR)**.
+En términos generales, los resultados muestran que el balance presenta una **alta sensibilidad a movimientos
+en tasas e indicadores**, y que dicha sensibilidad no se distribuye de manera homogénea, sino que se concentra
+en un conjunto relativamente reducido de exposiciones.
+
+En particular, la descomposición por cartera evidencia que el riesgo se encuentra **fuertemente concentrado en
+el libro pasivo**, especialmente en aquellas posiciones de mayor tamaño y mayor sensibilidad al **repricing**.
+Esto es consistente con la composición observada en el balance, donde una parte importante del saldo se encuentra
+asociada a obligaciones cuyo costo financiero depende de factores como **IPC, IBR** y **TA_Jur**. Como resultado,
+el comportamiento del margen financiero está determinado en buena medida por la dinámica de estas tasas.
+
+A nivel metodológico, el uso de un esquema que combina **simulación de factores de riesgo mediante un modelo VAR(1)**,
+proyección mensual del NII y descomposición por **factor** y **cartera** permitió obtener una visión más rica
+que la que ofrece una medida agregada aislada. No solo fue posible estimar el **EaR total**, sino también
+identificar con claridad cuáles son las principales fuentes de deterioro potencial del margen financiero y
+cómo se transmite ese riesgo a lo largo del horizonte de proyección.
+
+Adicionalmente, el análisis mensual del NII permitió detectar comportamientos estructurales relevantes del balance,
+como el salto observado entre el mes 6 y el mes 7, explicado por el **repricing semestral** de posiciones pasivas
+indexadas al **IPC**. Este tipo de hallazgos muestra que la dinámica del riesgo no depende únicamente del nivel
+de las tasas, sino también de la **estructura contractual** de las posiciones, incluyendo su periodicidad de ajuste
+y su esquema de amortización.
+
+En conjunto, el proyecto muestra que una aproximación cuantitativa bien estructurada permite transformar la
+información contractual del balance en una herramienta útil para la gestión del riesgo financiero. Aunque se trata
+de un **caso de estudio** y no de un motor regulatorio o productivo de ALM, el ejercicio ilustra de forma clara
+cómo integrar **datos, modelación estadística y valoración financiera** para analizar la vulnerabilidad del margen
+de interés ante escenarios adversos de mercado.
+""")
 
 
 
