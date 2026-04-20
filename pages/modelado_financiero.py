@@ -614,5 +614,396 @@ distribución simulada. Además del resultado agregado, el análisis se descompo
 de exposición y comprender cómo se distribuye el riesgo dentro del balance.
 """)
 
+# ============================================================
+# SECCIÓN: RESULTADOS
+# ============================================================
+from pathlib import Path
+import numpy as np
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+import streamlit as st
+
+st.subheader("Resultados")
+
+ruta_resultados = Path("data/modelo_financiero_data")
+
+# ------------------------------------------------------------
+# CARGA DE ARCHIVOS
+# ------------------------------------------------------------
+@st.cache_data
+def cargar_resultados(base_path):
+    resumen_total = pd.read_csv(base_path / "resumen_total.csv")
+    ear_factor = pd.read_csv(base_path / "ear_por_factor.csv")
+    ear_cartera = pd.read_csv(base_path / "ear_por_cartera.csv")
+    nii_base_mensual = pd.read_csv(base_path / "nii_base_mensual.csv")
+    nii_sim_total = pd.read_parquet(base_path / "nii_sim_total.parquet")
+    nii_sim_factor = pd.read_parquet(base_path / "nii_sim_factor.parquet")
+    nii_sim_cartera = pd.read_parquet(base_path / "nii_sim_cartera.parquet")
+    nii_sim_mensual = pd.read_parquet(base_path / "nii_sim_mensual.parquet")
+    detalle_base = pd.read_parquet(base_path / "detalle_base.parquet")
+    return (
+        resumen_total,
+        ear_factor,
+        ear_cartera,
+        nii_base_mensual,
+        nii_sim_total,
+        nii_sim_factor,
+        nii_sim_cartera,
+        nii_sim_mensual,
+        detalle_base,
+    )
+
+(
+    resumen_total,
+    ear_factor,
+    ear_cartera,
+    nii_base_mensual,
+    nii_sim_total,
+    nii_sim_factor,
+    nii_sim_cartera,
+    nii_sim_mensual,
+    detalle_base,
+) = cargar_resultados(ruta_resultados)
+
+# ------------------------------------------------------------
+# FUNCIONES AUXILIARES
+# ------------------------------------------------------------
+def valor_resumen(nombre):
+    fila = resumen_total.loc[resumen_total["Métrica"] == nombre, "Valor"]
+    if len(fila) == 0:
+        return np.nan
+    try:
+        return float(fila.iloc[0])
+    except:
+        return fila.iloc[0]
+
+def fmt_cop(x):
+    if pd.isna(x):
+        return "N/D"
+    return f"${x:,.0f}".replace(",", ".")
+
+def fmt_mm(x):
+    if pd.isna(x):
+        return "N/D"
+    return f"{x/1e6:,.2f} MM".replace(",", ".")
+
+def fmt_pct(x):
+    if pd.isna(x):
+        return "N/D"
+    return f"{100*x:.2f}%"
+
+# Valores principales
+nii_base = valor_resumen("NII base")
+media_nii = valor_resumen("Media NII simulado")
+mediana_nii = valor_resumen("Mediana NII simulado")
+p1_nii = valor_resumen("Percentil 1% NII")
+p5_nii = valor_resumen("Percentil 5% NII")
+ear_99 = valor_resumen("EaR 99%")
+ear_95 = valor_resumen("EaR 95%")
+n_sim = valor_resumen("Número de simulaciones")
+fecha_corte = valor_resumen("Fecha de corte")
+horizonte = valor_resumen("Horizonte (meses)")
+
+# Tablas ordenadas
+ear_factor = ear_factor.sort_values("EaR 99%", ascending=False).reset_index(drop=True)
+ear_cartera = ear_cartera.sort_values("EaR 99%", ascending=False).reset_index(drop=True)
+
+factor_top = ear_factor.iloc[0]["Factor"] if len(ear_factor) else "N/D"
+cartera_top = ear_cartera.iloc[0]["Cartera"] if len(ear_cartera) else "N/D"
+
+# ------------------------------------------------------------
+# TEXTO DE APERTURA
+# ------------------------------------------------------------
+st.markdown(f"""
+En esta sección se presentan los resultados de la proyección del **Ingreso Neto por Intereses (NII)**
+y de la estimación del **Earnings at Risk (EaR)** a un horizonte de **{int(horizonte)} meses**,
+utilizando **{int(n_sim)} escenarios simulados** y una fecha de corte de **{fecha_corte}**.
+
+El objetivo es mostrar no solo el resultado agregado del portafolio, sino también su descomposición
+por **factor de riesgo** y por **cartera**, con el fin de identificar las principales fuentes
+de sensibilidad del balance.
+""")
+
+# ------------------------------------------------------------
+# RESUMEN EJECUTIVO
+# ------------------------------------------------------------
+st.markdown("### Resumen ejecutivo")
+
+c1, c2, c3, c4 = st.columns(4)
+c1.metric("NII base", fmt_mm(nii_base))
+c2.metric("EaR 99%", fmt_mm(ear_99))
+c3.metric("Percentil 1% del NII", fmt_mm(p1_nii))
+c4.metric("Media del NII simulado", fmt_mm(media_nii))
+
+signo_base = "negativo" if nii_base < 0 else "positivo"
+mejora_media = "supera" if media_nii > nii_base else "se ubica por debajo de"
+
+st.markdown(f"""
+- El **NII base** del portafolio es **{signo_base}**, lo que sugiere que bajo el escenario de referencia
+  el margen financiero presenta presión por el lado del fondeo.
+- El **EaR al 99%** asciende a **{fmt_mm(ear_99)}**, cuantificando el deterioro potencial del NII
+  en escenarios extremos adversos.
+- En promedio, el NII simulado **{mejora_media}** el valor base, lo que indica que la distribución
+  de escenarios no se concentra exclusivamente en trayectorias adversas.
+- La principal fuente de riesgo se concentra en **{cartera_top}** a nivel de cartera y en **{factor_top}**
+  a nivel de factor.
+""")
+
+# ------------------------------------------------------------
+# TABS DE RESULTADOS
+# ------------------------------------------------------------
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    "Resultado total",
+    "EaR por factor",
+    "EaR por cartera",
+    "Trayectoria mensual del NII",
+    "Detalle de posiciones"
+])
+
+# ============================================================
+# TAB 1: RESULTADO TOTAL
+# ============================================================
+with tab1:
+    st.markdown("#### Distribución del NII simulado")
+
+    fig_hist = px.histogram(
+        nii_sim_total,
+        x="NII",
+        nbins=40,
+        opacity=0.8,
+        labels={"NII": "NII (COP)"},
+        title="Distribución del NII simulado"
+    )
+
+    fig_hist.add_vline(
+        x=nii_base,
+        line_width=2,
+        line_dash="dash",
+        annotation_text="NII base",
+        annotation_position="top right"
+    )
+    fig_hist.add_vline(
+        x=p1_nii,
+        line_width=2,
+        line_dash="dash",
+        annotation_text="Percentil 1%",
+        annotation_position="top left"
+    )
+    fig_hist.add_vline(
+        x=p5_nii,
+        line_width=2,
+        line_dash="dot",
+        annotation_text="Percentil 5%",
+        annotation_position="top left"
+    )
+
+    fig_hist.update_layout(
+        xaxis_title="NII (COP)",
+        yaxis_title="Frecuencia",
+        bargap=0.05
+    )
+    st.plotly_chart(fig_hist, use_container_width=True)
+
+    st.markdown("#### Tabla resumen")
+    tabla_total = resumen_total.copy()
+    tabla_total["Valor"] = tabla_total["Valor"].astype(str)
+    st.dataframe(tabla_total, use_container_width=True, hide_index=True)
+
+    st.markdown(f"""
+    **Lectura del resultado total**
+
+    El escenario base arroja un **NII de {fmt_cop(nii_base)}**, mientras que el percentil 1% de la
+    distribución simulada se ubica en **{fmt_cop(p1_nii)}**. La diferencia entre ambos valores da
+    lugar a un **EaR al 99% de {fmt_cop(ear_99)}**, que resume la pérdida potencial del margen
+    financiero ante movimientos adversos de tasas e indicadores.
+    """)
+
+# ============================================================
+# TAB 2: EAR POR FACTOR
+# ============================================================
+with tab2:
+    st.markdown("#### Descomposición del riesgo por factor")
+
+    fig_factor = px.bar(
+        ear_factor,
+        x="Factor",
+        y="EaR 99%",
+        text="EaR 99%",
+        title="EaR al 99% por factor de riesgo",
+        hover_data={
+            "NII base": ":,.0f",
+            "Media": ":,.0f",
+            "Mediana": ":,.0f",
+            "Percentil 1%": ":,.0f",
+            "Percentil 5%": ":,.0f",
+            "EaR 99%": ":,.0f",
+            "EaR 95%": ":,.0f",
+        }
+    )
+    fig_factor.update_traces(texttemplate="%{y:,.0f}", textposition="outside")
+    fig_factor.update_layout(
+        xaxis_title="Factor",
+        yaxis_title="EaR 99% (COP)"
+    )
+    st.plotly_chart(fig_factor, use_container_width=True)
+
+    st.dataframe(ear_factor, use_container_width=True, hide_index=True)
+
+    st.markdown(f"""
+    El análisis por factor muestra que la mayor contribución al riesgo proviene de **{factor_top}**,
+    seguido por los factores que presentan mayor sensibilidad sobre la estructura del balance. En cambio,
+    las exposiciones a **tasa fija** tienden a mostrar una contribución marginal al EaR, lo que resulta
+    consistente con su menor dependencia de los escenarios simulados.
+    """)
+
+# ============================================================
+# TAB 3: EAR POR CARTERA
+# ============================================================
+with tab3:
+    st.markdown("#### Descomposición del riesgo por cartera")
+
+    fig_cartera = px.bar(
+        ear_cartera,
+        x="Cartera",
+        y="EaR 99%",
+        text="EaR 99%",
+        title="EaR al 99% por cartera",
+        hover_data={
+            "NII base": ":,.0f",
+            "Media": ":,.0f",
+            "Mediana": ":,.0f",
+            "Percentil 1%": ":,.0f",
+            "Percentil 5%": ":,.0f",
+            "EaR 99%": ":,.0f",
+            "EaR 95%": ":,.0f",
+        }
+    )
+    fig_cartera.update_traces(texttemplate="%{y:,.0f}", textposition="outside")
+    fig_cartera.update_layout(
+        xaxis_title="Cartera",
+        yaxis_title="EaR 99% (COP)",
+        xaxis_tickangle=-25
+    )
+    st.plotly_chart(fig_cartera, use_container_width=True)
+
+    st.dataframe(ear_cartera, use_container_width=True, hide_index=True)
+
+    st.markdown(f"""
+    La descomposición por cartera indica que **{cartera_top}** concentra la mayor parte del riesgo
+    del portafolio. Este resultado es coherente con la composición del balance, en la medida en que
+    una parte importante de las posiciones sensibles al repricing y al costo financiero se ubica en
+    el libro pasivo.
+    """)
+
+# ============================================================
+# TAB 4: TRAYECTORIA MENSUAL DEL NII
+# ============================================================
+with tab4:
+    st.markdown("#### Perfil mensual del NII")
+
+    cols_meses = [c for c in nii_sim_mensual.columns if c.startswith("NII_mes_")]
+    tray = nii_sim_mensual[cols_meses].copy()
+
+    meses = np.arange(1, len(cols_meses) + 1)
+
+    media_m = tray.mean(axis=0).values
+    mediana_m = tray.median(axis=0).values
+    p5_m = tray.quantile(0.05, axis=0).values
+    p95_m = tray.quantile(0.95, axis=0).values
+    p1_m = tray.quantile(0.01, axis=0).values
+    p99_m = tray.quantile(0.99, axis=0).values
+    nii_base_m = nii_base_mensual["NII_mensual_base"].values
+
+    fig_tray = go.Figure()
+
+    fig_tray.add_trace(go.Scatter(
+        x=np.concatenate([meses, meses[::-1]]),
+        y=np.concatenate([p95_m, p5_m[::-1]]),
+        fill="toself",
+        name="Banda 5%-95%",
+        line=dict(width=0),
+        opacity=0.25
+    ))
+
+    fig_tray.add_trace(go.Scatter(
+        x=np.concatenate([meses, meses[::-1]]),
+        y=np.concatenate([p99_m, p1_m[::-1]]),
+        fill="toself",
+        name="Banda 1%-99%",
+        line=dict(width=0),
+        opacity=0.12
+    ))
+
+    fig_tray.add_trace(go.Scatter(
+        x=meses, y=media_m,
+        mode="lines+markers",
+        name="Media simulada"
+    ))
+
+    fig_tray.add_trace(go.Scatter(
+        x=meses, y=mediana_m,
+        mode="lines",
+        line=dict(dash="dash"),
+        name="Mediana simulada"
+    ))
+
+    fig_tray.add_trace(go.Scatter(
+        x=meses, y=nii_base_m,
+        mode="lines+markers",
+        name="NII base mensual",
+        line=dict(width=3)
+    ))
+
+    fig_tray.update_layout(
+        title="Trayectoria mensual del NII",
+        xaxis_title="Mes",
+        yaxis_title="NII mensual (COP)",
+        xaxis=dict(tickmode="linear", tick0=1, dtick=1)
+    )
+
+    st.plotly_chart(fig_tray, use_container_width=True)
+
+    st.dataframe(nii_base_mensual, use_container_width=True, hide_index=True)
+
+    st.markdown("""
+    La trayectoria mensual permite comparar el perfil del **NII base** frente al comportamiento
+    promedio y a la dispersión de los escenarios simulados. La apertura gradual de las bandas
+    percentilares refleja la acumulación de incertidumbre a medida que aumenta el horizonte,
+    mientras que la comparación con la trayectoria base ayuda a identificar meses con mayor
+    sensibilidad del margen financiero.
+    """)
+
+# ============================================================
+# TAB 5: DETALLE DE POSICIONES
+# ============================================================
+with tab5:
+    st.markdown("#### Posiciones con mayor contribución al NII base")
+
+    detalle_base_orden = detalle_base.sort_values("NII", ascending=False).reset_index(drop=True)
+
+    col_pos, col_neg = st.columns(2)
+
+    with col_pos:
+        st.markdown("**Top 10 posiciones con mayor aporte positivo al NII base**")
+        st.dataframe(
+            detalle_base_orden.head(10),
+            use_container_width=True,
+            hide_index=True
+        )
+
+    with col_neg:
+        st.markdown("**Top 10 posiciones con mayor aporte negativo al NII base**")
+        st.dataframe(
+            detalle_base_orden.sort_values("NII", ascending=True).head(10),
+            use_container_width=True,
+            hide_index=True
+        )
+
+    st.markdown("""
+    Este detalle permite identificar qué posiciones explican, en mayor medida, el signo y el nivel
+    del **NII base**. En particular, resulta útil para entender qué exposiciones generan ingresos
+    relevantes y cuáles ejercen presión sobre el margen financiero desde el lado del fondeo.
+    """)
 
 
