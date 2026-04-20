@@ -46,7 +46,7 @@ más realista de la sensibilidad del balance ante distintos escenarios.
 
 Finalmente, los resultados se presentan de forma agregada y desagregada por **factor de riesgo** 
 y **cartera**, permitiendo identificar las principales fuentes de exposición y el comportamiento 
-del NII bajo escenarios adversos.
+del NII bajo escenarios adversos. El codigo del proyecto se encuetra en el github,[Codigo del proyecto](https://github.com/LuisMantilla28/portfolio_streamlit/blob/9ffa8ae40860d2e76bd6cb9e6af6d6c23a72d6e6/Notebooks/Balance_proyectado.ipynb).
 """)
 
 st.subheader("Objetivos")
