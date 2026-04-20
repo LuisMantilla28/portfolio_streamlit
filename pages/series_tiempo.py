@@ -80,12 +80,17 @@ st.write(
 
     Los factores considerados fueron:
 
-    - **DTF**
-    - **IBR**
-    - **IPC**
-    - **Cuvr**
-    - **Auvr**
-    - **TA_Jur**
+    - **DTF**: tasa de referencia del mercado financiero colombiano, tradicionalmente asociada
+      a depósitos a término y utilizada como indicador de fondeo.
+    - **IBR**: tasa interbancaria de referencia que refleja el costo de los préstamos de muy
+      corto plazo entre entidades financieras.
+    - **IPC**: variación del índice de precios al consumidor, utilizada como medida de inflación.
+    - **Cuvr**: tasa asociada a productos de **construcción de vivienda** indexados a condiciones
+      del mercado y/o a la evolución de variables de referencia del sistema financiero.
+    - **Auvr**: tasa asociada a productos de **adquisición de vivienda**, relevante para la
+      valoración de cartera hipotecaria.
+    - **TA_Jur**: tasa correspondiente a **cuentas de ahorro jurídicas**, representativa del costo
+      financiero de este tipo de captación dentro del balance.
 
     Estas series se utilizaron como variables de entrada para comparar distintas metodologías
     de modelación de series de tiempo. Dado que algunos factores en niveles presentaban señales
