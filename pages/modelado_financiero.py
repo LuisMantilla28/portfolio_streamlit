@@ -967,11 +967,16 @@ with tab4:
 
 
     st.markdown("""
-    La trayectoria mensual permite comparar el perfil del **NII base** frente al comportamiento
-    promedio y a la dispersión de los escenarios simulados. La apertura gradual de las bandas
-    percentilares refleja la acumulación de incertidumbre a medida que aumenta el horizonte,
-    mientras que la comparación con la trayectoria base ayuda a identificar meses con mayor
-    sensibilidad del margen financiero.
+    Se observa un **cambio marcado entre el mes 6 y el mes 7** en la trayectoria mensual del NII. 
+Este comportamiento se explica principalmente por el **repricing semestral** de algunas posiciones 
+de la **Cartera Pasiva** indexadas al **IPC**, en particular las posiciones **023CCFF** y **024ZZUU**. 
+Ambas tienen **`PeriodoInteres = S`**, por lo que en el modelo la tasa aplicada se mantiene fija 
+durante los primeros seis meses y se actualiza al inicio del séptimo mes con el nuevo valor del 
+factor correspondiente. Dado que se trata de **pasivos** y además de posiciones con saldos elevados, 
+cualquier cambio en la tasa utilizada a partir del mes 7 tiene un impacto visible sobre el gasto por 
+intereses y, por consiguiente, sobre el **Ingreso Neto por Intereses (NII)**. En este caso, el salto 
+observado no corresponde a un error numérico, sino a un **efecto estructural del esquema contractual 
+de repricing** de estas obligaciones.
     """)
 
 # ============================================================
@@ -1001,9 +1006,17 @@ with tab5:
         )
 
     st.markdown("""
-    Este detalle permite identificar qué posiciones explican, en mayor medida, el signo y el nivel
-    del **NII base**. En particular, resulta útil para entender qué exposiciones generan ingresos
-    relevantes y cuáles ejercen presión sobre el margen financiero desde el lado del fondeo.
+Estas tablas permiten identificar con mayor precisión **qué posiciones explican el nivel y el signo del NII base**. 
+Por el lado positivo, los mayores aportes provienen principalmente de posiciones **activas** de 
+**Adquisición de Vivienda** y **Cartera Ordinaria**, especialmente aquellas asociadas a **tasa fija** 
+y a **DTF**, que generan una contribución importante al ingreso financiero del portafolio. En contraste, 
+la presión negativa sobre el margen se concentra en posiciones **pasivas** de la **Cartera Pasiva**, 
+en particular las indexadas a **IPC** e **IBR**. Destacan especialmente las posiciones **023CCFF** y 
+**024ZZUU**, ambas clasificadas como pasivos IPC bajo plan **CREG**, cuyos saldos elevados hacen que 
+su costo financiero tenga un efecto material sobre el NII. En conjunto, las tablas muestran que el 
+resultado base del portafolio surge del contraste entre un grupo relativamente reducido de posiciones 
+activas con alta capacidad de generación de ingresos y un bloque de posiciones pasivas que concentra 
+la mayor parte de la presión sobre el margen financiero.
     """)
 
 
