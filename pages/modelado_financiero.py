@@ -99,7 +99,7 @@ financiero ante distintos escenarios de mercado.
 # ============================================================
 # SECCIÓN: DATOS - BALANCE.XLSX
 # ============================================================
-st.subheader("Datos")
+
 
 ruta_balance = Path("data/modelo_financiero_data/Balance.xlsx")
 
@@ -200,9 +200,8 @@ diccionario_columnas = pd.DataFrame({
 })
 
 st.markdown(f"""
-El archivo **`Balance.xlsx`** contiene el detalle de las posiciones del libro bancario en la hoja
-**`InfoFacial`**, que es la base principal para proyectar el **Ingreso Neto por Intereses (NII)**.
-
+El archivo [**`Balance.xlsx`**](https://github.com/LuisMantilla28/portfolio_streamlit/blob/c1730a022dfcd4685d56944d64892ed1fa375c38/data/modelo_financiero_data/Balance.xlsx) contiene el detalle de las posiciones del libro bancario en la hoja
+**`InfoFacial`**, que es la base principal para proyectar el **Ingreso Neto por Intereses (NII)**. 
 Cada fila representa una posición individual y combina información de **saldo**, **naturaleza**
 (activo o pasivo), **cartera**, **tasa de referencia**, **spread**, **fechas contractuales** y
 **plan de amortización**. En conjunto, esta estructura permite modelar cómo evoluciona el margen
