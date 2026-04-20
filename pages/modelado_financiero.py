@@ -315,11 +315,11 @@ with st.expander("Ver descripción detallada del archivo Balance.xlsx", expanded
     # TAB 1: RESUMEN GENERAL
     # --------------------------------------------------------
     with tab1:
-        c1, c2, c3, c4 = st.columns(4)
+        c1, c2, c3 = st.columns(4)
         c1.metric("Número de posiciones", f"{n_posiciones}")
         c2.metric("Número de variables", f"{n_columnas}")
         c3.metric("Saldo total", formato_moneda(saldo_total))
-        c4.metric("Horizonte observado", f"{fecha_min.date()} a {fecha_max.date()}")
+
 
         st.markdown("""
         **Lectura general del archivo**
