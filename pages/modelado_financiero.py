@@ -890,10 +890,14 @@ with tab3:
     st.dataframe(ear_cartera, use_container_width=True, hide_index=True)
 
     st.markdown(f"""
-    La descomposición por cartera indica que **{cartera_top}** concentra la mayor parte del riesgo
-    del portafolio. Este resultado es coherente con la composición del balance, en la medida en que
-    una parte importante de las posiciones sensibles al repricing y al costo financiero se ubica en
-    el libro pasivo.
+  La descomposición por cartera evidencia una **fuerte concentración del riesgo en {cartera_top}**,
+que explica la mayor parte del **EaR** del portafolio. Este resultado es consistente con la
+estructura del balance, donde las posiciones pasivas de mayor tamaño concentran buena parte de la
+sensibilidad al **repricing** y al **costo financiero**. En contraste, el resto de carteras muestra
+una incidencia mucho menor sobre el riesgo agregado; incluso en el caso de **CDT**, el valor
+ligeramente negativo del EaR refleja una exposición prácticamente nula, más que una fuente material
+de deterioro del margen financiero. En conjunto, los resultados indican que el riesgo no está
+distribuido de forma homogénea, sino claramente concentrado en el libro pasivo.
     """)
 
 # ============================================================
