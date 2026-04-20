@@ -527,9 +527,6 @@ metodológicos para traducir la información contractual del balance en trayecto
 
 - El horizonte de análisis es de **12 meses**, con fecha de corte **26 de abril de 2020**.
 
-- El universo de trabajo corresponde a las posiciones de la hoja **`InfoFacial`**, incluyendo
-exposiciones asociadas a **`TA_Jur`**. Por ello, la composición del balance utilizada aquí puede
-diferir de otros resúmenes agregados del archivo original.
 
 - El **NII** se calcula sobre **base devengada mensual**, es decir, los intereses se reconocen
 mes a mes y no únicamente cuando ocurre el pago contractual.
@@ -561,6 +558,61 @@ deben interpretarse como una aproximación metodológicamente consistente al rie
 como un motor regulatorio o productivo de ALM.
 """)
 
+st.subheader("Metodología")
+
+st.markdown("""
+La metodología del proyecto se estructura en cinco etapas principales, con el objetivo de
+traducir la información contractual del balance en una medición cuantitativa del
+**Earnings at Risk (EaR)** sobre el **Ingreso Neto por Intereses (NII)**.
+
+**1. Preparación y limpieza de datos**
+
+En una primera etapa se realiza la lectura y depuración del archivo **`Balance.xlsx`**
+y de la base histórica de factores de riesgo. Esto incluye la estandarización de nombres
+de variables, la conversión de fechas, la limpieza de montos y la validación de campos
+clave como la naturaleza de la posición, el plan de amortización, el tipo de tasa y la
+periodicidad contractual.
+
+**2. Construcción del escenario base**
+
+A partir del último dato histórico disponible antes de la fecha de corte, se construye una
+trayectoria base de tasas e indicadores para los siguientes 12 meses. Este escenario sirve
+como punto de referencia para estimar el **NII base**, es decir, el margen financiero que
+se obtendría si las condiciones de mercado permanecieran constantes en el horizonte de análisis.
+
+**3. Generación de escenarios simulados**
+
+La simulación de los factores de riesgo se realiza a partir de un **modelo estadístico VAR(1)**,
+ajustado sobre las series históricas observadas. Este modelo permite capturar la dinámica conjunta
+y la dependencia temporal entre variables como **DTF, IBR, IPC, Auvr, Cuvr y TA_Jur**, generando
+trayectorias mensuales consistentes para el horizonte de proyección. El procedimiento detallado
+de ajuste, validación y simulación del modelo puede consultarse en la sección correspondiente de
+series de tiempo.
+""")
+
+st.page_link(
+    "pages/series_tiempo.py",
+    label="Ver procedimiento detallado del modelo VAR(1)",
+    icon="📈"
+)
+
+st.markdown("""
+**4. Valoración mensual del NII**
+
+Con el balance y las trayectorias de tasas, se proyecta el **Ingreso Neto por Intereses**
+mes a mes. Para cada posición se consideran su **naturaleza** (activo o pasivo), el
+**saldo de capital**, la **tasa de referencia**, el **spread**, la **frecuencia de repricing**,
+las **fechas contractuales** y el **plan de amortización**. De esta manera, el cálculo del NII
+refleja la evolución del saldo y de la tasa aplicable a lo largo del tiempo.
+
+**5. Cálculo del EaR y descomposición de resultados**
+
+Finalmente, con la distribución de NII obtenida a partir de los escenarios simulados, se
+calcula el **EaR** como la diferencia entre el **NII base** y un percentil adverso de la
+distribución simulada. Además del resultado agregado, el análisis se descompone por
+**factor de riesgo** y por **cartera**, con el fin de identificar las principales fuentes
+de exposición y comprender cómo se distribuye el riesgo dentro del balance.
+""")
 
 
 
