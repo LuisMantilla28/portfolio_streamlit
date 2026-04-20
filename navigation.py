@@ -47,8 +47,8 @@ def show():
             st.switch_page("pages/series_tiempo.py")
 
         if st.button("💰 Modelado financiero"):
-            st.write("Próximamente")
-
+            st.switch_page("pages/modelado_financiero.py")
+            
         if st.button("🤖 Machine Learning"):
             st.write("Próximamente")
 
