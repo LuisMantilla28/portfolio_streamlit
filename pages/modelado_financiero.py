@@ -964,7 +964,7 @@ with tab4:
 
     st.plotly_chart(fig_tray, use_container_width=True)
 
-    st.dataframe(nii_base_mensual, use_container_width=True, hide_index=True)
+
 
     st.markdown("""
     La trayectoria mensual permite comparar el perfil del **NII base** frente al comportamiento
