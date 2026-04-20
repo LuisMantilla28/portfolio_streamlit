@@ -111,7 +111,10 @@ def cargar_balance(ruta):
     # Limpieza básica
     df["Fecha Inicio"] = pd.to_datetime(df["Fecha Inicio"], errors="coerce")
     df["Fecha Vencimiento"] = pd.to_datetime(df["Fecha Vencimiento"], errors="coerce")
-    df["SaldoCapital"] = pd.to_numeric(df["SaldoCapital"], errors="coerce")
+    df["SaldoCapital"] = pd.to_numeric(
+    df["SaldoCapital"].astype(str).str.replace(",", "", regex=False).str.strip(),
+    errors="coerce"
+        )
     df["PuntosAdicionales"] = pd.to_numeric(df["PuntosAdicionales"], errors="coerce")
     df["FrecuenciaInteres"] = pd.to_numeric(df["FrecuenciaInteres"], errors="coerce")
 
