@@ -404,18 +404,9 @@ with st.expander("Ver descripción detallada del archivo Balance.xlsx", expanded
 
         col3, col4 = st.columns(2)
 
-        with col3:
-            fig_nat = px.pie(
-                resumen_naturaleza,
-                names="TipoPosicion",
-                values="SaldoBillones",
-                title="Distribución del saldo por naturaleza",
-                hole=0.35
-            )
-            fig_nat.update_traces(textinfo="percent+label")
-            st.plotly_chart(fig_nat, use_container_width=True)
+       
 
-        with col4:
+        with col3:
             fig_plan = px.bar(
                 resumen_plan,
                 x="PlanAmortizacion",
