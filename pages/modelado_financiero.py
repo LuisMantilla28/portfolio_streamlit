@@ -518,3 +518,49 @@ with st.expander("Ver descripción detallada del archivo Balance.xlsx", expanded
 
         st.dataframe(vista_balance, use_container_width=True, height=500)
 
+st.subheader("Supuestos clave")
+
+st.markdown("""
+La construcción del ejercicio de **Earnings at Risk (EaR)** requiere establecer algunos supuestos
+metodológicos para traducir la información contractual del balance en trayectorias mensuales de
+**Ingreso Neto por Intereses (NII)**. En este proyecto se adoptan los siguientes:
+
+- El horizonte de análisis es de **12 meses**, con fecha de corte **26 de abril de 2020**.
+
+- El universo de trabajo corresponde a las posiciones de la hoja **`InfoFacial`**, incluyendo
+exposiciones asociadas a **`TA_Jur`**. Por ello, la composición del balance utilizada aquí puede
+diferir de otros resúmenes agregados del archivo original.
+
+- El **NII** se calcula sobre **base devengada mensual**, es decir, los intereses se reconocen
+mes a mes y no únicamente cuando ocurre el pago contractual.
+
+- Para las posiciones a **tasa variable**, la tasa aplicable en cada escenario se construye a
+partir de la trayectoria simulada del factor de riesgo correspondiente y del **spread** indicado
+en el balance.
+
+- En el caso de la **DTF**, el spread se suma o resta primero sobre la **tasa trimestral
+anticipada**, y posteriormente se convierte a tasa efectiva anual para la valoración.
+
+- La variable **`PeriodoInteres`** y, cuando aplica, **`FrecuenciaInteres`**, se interpretan
+como guía para la frecuencia de **repricing o reset** de las tasas. Dentro de cada bloque de
+repricing, la tasa se mantiene constante.
+
+- Las posiciones se valorizan respetando su **fecha de inicio**, **fecha de vencimiento** y
+**plan de amortización**, de modo que solo generan intereses durante el periodo en que se
+encuentran activas.
+
+- Para posiciones con plan **CREG**, el saldo se reduce gradualmente mediante una aproximación
+de amortización mensual; para **INTPER** y **DSCTO**, el capital se mantiene hasta el vencimiento,
+de acuerdo con la lógica contractual de cada producto.
+
+- El signo del NII depende de la **naturaleza** de la posición: los **activos** generan ingresos
+por intereses y los **pasivos** generan gastos por intereses.
+
+- El análisis se desarrolla como un **caso de estudio cuantitativo**, por lo que los resultados
+deben interpretarse como una aproximación metodológicamente consistente al riesgo de tasa, y no
+como un motor regulatorio o productivo de ALM.
+""")
+
+
+
+
