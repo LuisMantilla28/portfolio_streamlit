@@ -1,0 +1,14 @@
+Variable,Descripción
+Código,Identificador de la posición financiera.
+PuntosAdicionales,Spread o puntos adicionales sobre la tasa de referencia.
+Signo,Indica si el spread se suma o se resta a la tasa base.
+TasaBase,Tasa contractual cuando la posición está a tasa fija.
+PeriodoInteres,"Periodicidad contractual relevante para intereses o repricing (M, T, S, D, etc.)."
+FrecuenciaInteres,Frecuencia numérica asociada al esquema de interés o repricing.
+Fecha Inicio,Fecha de inicio de la operación.
+Fecha Vencimiento,Fecha de vencimiento de la operación.
+Cartera,Cartera o segmento al que pertenece la posición.
+PlanAmortizacion,Esquema de amortización contractual.
+SaldoCapital,Saldo de capital sobre el cual se calculan los intereses.
+naturaleza,"Naturaleza de la posición: A = activo, P = pasivo."
+Tasa,Factor de riesgo o tipo de tasa asociado a la posición.
