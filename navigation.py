@@ -52,8 +52,6 @@ def show():
         if st.button("🤖 Machine Learning"):
             st.write("Próximamente")
 
-        if st.button("🧾 CV"):
-            st.write("Próximamente")
 
         st.markdown("---")
         st.markdown("### Enlaces")
