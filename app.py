@@ -247,7 +247,7 @@ with p4:
         "Statistics · Unsupervised Learning",
         "Aprendizaje no Supervisado y Análisis Multivariado",
         "Proyecto en Quarto orientado a exploración estructural de datos, reducción de dimensionalidad y lectura estadística de patrones multivariados.",
-        ["Análisis multivariado", "Unsupervised learning", "Quarto", "EDA", "Visualización"],
+        ["Análisis multivariado", "Unsupervised learning", "Quarto", "EDA", "Visualización", "R"],
         "https://luis-mantilla.quarto.pub/aa_cd/Analisis_Multivariado.html#an%C3%A1lisis-sobre-las-variables"
     )
 
