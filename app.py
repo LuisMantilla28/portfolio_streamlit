@@ -142,10 +142,9 @@ with col1:
     )
 
     st.write("""
-    Matemático y estudiante de maestría en estadística. 
-    Desarrollo proyectos aplicados en **analítica bancaria**, **series de tiempo**, 
-    **modelado financiero** y **aprendizaje estadístico**, con énfasis en 
-    **riesgo**, **toma de decisiones** y **finanzas cuantitativas**.
+   Matemático y candidato a Magíster en Estadística, con interés en la intersección entre datos, riesgo y finanzas 
+   cuantitativas. Desarrollo proyectos aplicados en analítica bancaria, series de tiempo, modelado financiero y aprendizaje estadístico. 
+   Actualmente, mi tesis se enfoca en valoración de opciones y modelado financiero.
     """)
 
     cta1, cta2, cta3 = st.columns(3)
