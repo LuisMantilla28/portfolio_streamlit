@@ -261,20 +261,25 @@ st.markdown("<div class='section-title'>🏆 Logro destacado</div>", unsafe_allo
 l1, l2 = st.columns([1.2, 1], gap="large")
 
 with l1:
-    st.markdown("""
-    <div class="card">
-        <div class="eyebrow">Validación externa</div>
-        <h3>1.er lugar — Competencia de Casos CAS + ACTEX 2025</h3>
-        <p>
-        Integrante del equipo ganador en la competencia de casos actuariales,
-        representando a la Universidad Nacional de Colombia.
-        </p>
-        <p>
-        Este logro refuerza mi interés por la intersección entre
-        <b>riesgo</b>, <b>modelación cuantitativa</b> y <b>aplicación real</b>.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+   st.markdown("""
+<div class="card">
+    <div class="eyebrow">Validación externa</div>
+    <h3>1.er lugar — Competencia de Casos CAS + ACTEX 2025</h3>
+    <p>
+    Integrante del equipo ganador, representando a la Universidad Nacional de Colombia,
+    en una competencia centrada en modelación predictiva para tarificación actuarial.
+    </p>
+    <p>
+    El caso requería estimar primas puras de riesgo mediante modelos construidos con datos
+    históricos de siniestralidad y características de los asegurados, combinando precisión
+    predictiva, interpretación y criterio de negocio.
+    </p>
+    <p>
+    Este resultado refuerza mi interés por el uso de la <b>estadística</b> y la
+    <b>modelación cuantitativa</b> en problemas reales de <b>riesgo</b> y <b>seguros</b>.
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
 with l2:
     st.link_button(
