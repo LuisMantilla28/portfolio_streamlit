@@ -160,7 +160,7 @@ with col2:
     st.markdown("### Perfil")
     profile_path = Path("assets/profile.png")
     if profile_path.exists():
-        st.image(str(profile_path), use_container_width=True)
+        st.image(str(profile_path), width=220)
     else:
         st.info("Puedes agregar una foto en `assets/profile.png`.")
 
