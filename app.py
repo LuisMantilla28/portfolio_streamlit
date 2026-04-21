@@ -173,7 +173,7 @@ st.markdown("")
 # ---------------------------------------------------
 # MÉTRICAS RÁPIDAS
 # ---------------------------------------------------
-m1, m2, m3, m4 = st.columns(4)
+m1, m2, m3 = st.columns(3)
 
 with m1:
     st.markdown("""
@@ -199,13 +199,7 @@ with m3:
     </div>
     """, unsafe_allow_html=True)
 
-with m4:
-    st.markdown("""
-    <div class="metric-card">
-        <div class="metric-value">Estadística + Negocio</div>
-        <div class="metric-label">perfil híbrido</div>
-    </div>
-    """, unsafe_allow_html=True)
+
 
 st.markdown("---")
 
