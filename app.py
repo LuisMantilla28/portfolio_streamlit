@@ -291,7 +291,7 @@ with l2:
     )
     st.link_button(
         "Ver presentación final",
-        "https://www.youtube.com/watch?v=is-sw5alnpw&t=1038s",
+        "https://www.youtube.com/watch?v=is-sw5alnpw&t",
         use_container_width=True
     )
 
