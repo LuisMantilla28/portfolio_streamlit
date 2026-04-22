@@ -55,5 +55,5 @@ def show():
 
         st.markdown("---")
         st.markdown("### Enlaces")
-        st.link_button("GitHub", "https://github.com/tu_usuario")
-        st.link_button("LinkedIn", "https://www.linkedin.com/in/tu_usuario/")
+        st.link_button("GitHub", "https://github.com/LuisMantilla28/portfolio_streamlit")
+        st.link_button("LinkedIn", "https://www.linkedin.com/in/luis-enrique-mantilla-sanabria-905a01271/")
