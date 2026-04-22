@@ -2,7 +2,7 @@ import streamlit as st
 
 
 def show():
-    custom_style = """
+   custom_style = """
     <style>
     [data-testid="stSidebarNav"] {
         display: none;
@@ -15,17 +15,6 @@ def show():
     [data-testid="stSidebar"] {
         min-width: 18rem !important;
         max-width: 18rem !important;
-        transform: none !important;
-        visibility: visible !important;
-    }
-
-    [data-testid="stSidebar"][aria-expanded="false"] {
-        min-width: 18rem !important;
-        max-width: 18rem !important;
-    }
-
-    [data-testid="stSidebar"][aria-expanded="false"] > div:first-child {
-        margin-left: 0rem !important;
     }
     </style>
     """
