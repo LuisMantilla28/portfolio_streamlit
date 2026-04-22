@@ -194,7 +194,7 @@ with m2:
 with m3:
     st.markdown("""
     <div class="metric-card">
-        <div class="metric-value">Riesgo + Datos</div>
+        <div class="metric-value">Finanzas + Datos</div>
         <div class="metric-label">enfoque aplicado</div>
     </div>
     """, unsafe_allow_html=True)
