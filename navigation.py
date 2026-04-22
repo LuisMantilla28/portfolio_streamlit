@@ -2,7 +2,7 @@ import streamlit as st
 
 
 def show():
-   custom_style = """
+    custom_style = """
     <style>
     [data-testid="stSidebarNav"] {
         display: none;
