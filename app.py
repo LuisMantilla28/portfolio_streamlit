@@ -266,7 +266,7 @@ with l1:
     <div class="eyebrow">Validación externa</div>
     <h3>1.er lugar — Competencia de Casos CAS + ACTEX 2025</h3>
     <p>
-    Integrante del equipo ganador, representando a la Universidad Nacional de Colombia,
+    Integrante del equipo ganador "Riskbusters", representando a la Universidad Nacional de Colombia,
     en una competencia centrada en modelación predictiva para tarificación actuarial.
     </p>
     <p>
