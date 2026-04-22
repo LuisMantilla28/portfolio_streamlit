@@ -19,7 +19,11 @@ st.markdown("""
     .block-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        min-width: 1180px;
         max-width: 1180px;
+        margin: 0 auto;
     }
 
     .hero-title {
@@ -106,6 +110,7 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
 
 # ---------------------------------------------------
 # HELPERS
