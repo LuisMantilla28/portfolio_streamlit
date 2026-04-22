@@ -3,13 +3,9 @@ import streamlit as st
 
 def show():
     custom_style = """
-    <style>
+     <style>
     [data-testid="stSidebarNav"] {
         display: none;
-    }
-
-    header {
-        visibility: hidden;
     }
 
     [data-testid="stSidebar"] {
