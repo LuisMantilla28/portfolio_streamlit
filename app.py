@@ -16,12 +16,11 @@ navigation.show()
 # ---------------------------------------------------
 st.markdown("""
 <style>
-    .block-container {
-        padding-top: 2rem;
+    .block-container { 
+        padding-top: 5.5rem;
         padding-bottom: 2rem;
         padding-left: 2rem;
         padding-right: 2rem;
-        min-width: 1180px;
         max-width: 1180px;
         margin: 0 auto;
     }
