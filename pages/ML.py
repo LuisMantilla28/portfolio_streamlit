@@ -103,8 +103,24 @@ solo el 6.7% de la muestra.
 
 st.dataframe(resumen_modelos, use_container_width=True, hide_index=True)
 
-# Curvas ROC y Precision-Recall
-fig_curvas = go.Figure()
+st.markdown("---")
+
+# ---------------------------------------------------------------
+# CURVAS ROC Y PRECISION-RECALL
+# ---------------------------------------------------------------
+st.subheader("Evaluación del poder discriminante")
+
+st.markdown("""
+Para evaluar los modelos se usan dos curvas complementarias. La **Curva ROC** mide
+la capacidad general de discriminación: qué tan bien separa el modelo a los clientes
+que van a defaultear de los que no. El área bajo esta curva (**AUC-ROC**) resume ese
+poder en un solo número — 1.0 sería perfecto, 0.5 sería equivalente a lanzar una moneda.
+
+La **Curva Precision-Recall** es más informativa en contextos de desbalance como este.
+Responde una pregunta más exigente: de los clientes que el modelo marca como riesgo,
+¿cuántos realmente van a defaultear? Esta curva cae más rápido porque detectar defaults
+con alta precisión es difícil cuando son minoría.
+""")
 
 col1, col2 = st.columns(2)
 
@@ -121,14 +137,14 @@ with col1:
         mode="lines", line=dict(width=2)
     ))
     fig_roc.add_trace(go.Scatter(
-        x=[0,1], y=[0,1], mode="lines",
+        x=[0, 1], y=[0, 1], mode="lines",
         line=dict(dash="dash", color="gray", width=1),
         showlegend=False
     ))
     fig_roc.update_layout(
         title="Curva ROC",
-        xaxis_title="Tasa de Falsos Positivos",
-        yaxis_title="Tasa de Verdaderos Positivos",
+        xaxis_title="Falsos Positivos (clientes solventes mal clasificados)",
+        yaxis_title="Verdaderos Positivos (defaults detectados)",
         height=420, legend=dict(x=0.5, y=0.1)
     )
     st.plotly_chart(fig_roc, use_container_width=True)
@@ -145,27 +161,45 @@ with col2:
     ))
     fig_pr.update_layout(
         title="Curva Precision-Recall",
-        xaxis_title="Recall",
-        yaxis_title="Precision",
+        xaxis_title="Recall (% de defaults reales detectados)",
+        yaxis_title="Precision (% de aciertos entre los alertados)",
         height=420, legend=dict(x=0.5, y=0.9)
     )
     st.plotly_chart(fig_pr, use_container_width=True)
 
 st.markdown("""
-XGBoost supera a la Regresión Logística en AUC-ROC (0.869 vs 0.860), capturando
-relaciones no lineales entre variables como `mora_acumulada`, `revolving_util` y `age`.
-Sin embargo, la Logística sigue siendo valiosa como **baseline interpretable** y como
-referencia regulatoria — en banca, un modelo que nadie puede explicar difícilmente
-pasa un comité de riesgo.
+XGBoost alcanza un **AUC-ROC de 0.869** frente al **0.860** de la Regresión Logística.
+La diferencia es moderada — lo que indica que las variables están bien construidas y que
+incluso un modelo simple captura el patrón principal. Sin embargo, XGBoost tiene ventaja
+en variables con efectos no lineales como `age` y `mora_acumulada`, donde la Logística
+asume relaciones que los datos no respetan.
+
+La Regresión Logística se mantiene como **baseline obligatorio** en crédito: sus
+coeficientes son directamente interpretables como odds ratios, lo que facilita la
+validación regulatoria y la explicación a comités de riesgo.
 """)
 
-# Trade-off de umbral
-st.subheader("Trade-off del umbral de decisión")
+st.markdown("---")
+
+# ---------------------------------------------------------------
+# UMBRAL DE DECISIÓN
+# ---------------------------------------------------------------
+st.subheader("¿A partir de qué probabilidad se rechaza un cliente?")
 
 st.markdown("""
-En crédito, el umbral de decisión no es arbitrario: define el balance entre capturar
-defaults (recall) y evitar rechazar clientes solventes (precision). La elección depende
-del **apetito de riesgo** del negocio.
+Todo modelo de clasificación produce una probabilidad entre 0 y 1. Para convertirla
+en una decisión — aprobar o rechazar — se necesita un **umbral**: si la probabilidad
+supera ese valor, el cliente se clasifica como riesgo de default.
+
+Por defecto se usa 0.5, pero en crédito ese umbral raramente es el óptimo. El problema
+es asimétrico: prestarle a alguien que no va a pagar genera una pérdida real, mientras
+que rechazar a un cliente solvente es solo una oportunidad perdida. Dependiendo del
+apetito de riesgo del negocio, conviene ajustar ese punto de corte.
+
+La siguiente gráfica muestra cómo cambian tres métricas al mover el umbral:
+- **Recall:** qué porcentaje de los defaults reales estamos capturando
+- **Precision:** de los que marcamos como default, cuántos realmente lo son
+- **F1:** balance entre ambas — útil cuando ninguna puede sacrificarse completamente
 """)
 
 fig_umbral = go.Figure()
@@ -190,13 +224,22 @@ fig_umbral.update_layout(
 st.plotly_chart(fig_umbral, use_container_width=True)
 
 st.markdown("""
-- **Umbral 0.20:** captura el 94% de defaults con precisión del 12%. Recomendado
-  para originación masiva donde el costo de prestarle a quien no paga supera
-  ampliamente el costo de rechazar a un buen cliente.
-- **Umbral 0.50:** más selectivo — precisión del 22% pero captura solo el 78%
-  de defaults. Adecuado cuando los recursos de seguimiento son limitados.
-""")
+La gráfica confirma el trade-off esperado: a medida que bajamos el umbral, capturamos
+más defaults (Recall sube) pero a costa de más falsas alarmas (Precision baja).
 
+**¿Qué umbral elegir?**
+
+- **Umbral 0.20 — originación masiva:** captura el 94% de defaults con precisión del 12%.
+  Adecuado cuando el costo de aprobar a alguien que no va a pagar supera ampliamente
+  el costo de rechazar a un buen cliente. El banco prefiere ser conservador.
+
+- **Umbral 0.50 — seguimiento focalizado:** precisión del 22% pero captura el 78%
+  de defaults. Útil cuando los recursos de gestión de mora son limitados y se quiere
+  concentrar esfuerzos solo en los casos más probables.
+
+No existe un umbral universalmente correcto — la decisión depende del contexto
+del negocio y del costo relativo de cada tipo de error.
+""")
 st.markdown("---")
 
 # ===============================================================
