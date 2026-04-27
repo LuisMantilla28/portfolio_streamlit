@@ -248,15 +248,32 @@ st.markdown("---")
 st.header("3. Interpretabilidad — SHAP values")
 
 st.markdown("""
-SHAP (SHapley Additive exPlanations) permite responder la pregunta que cualquier
-comité de riesgo haría: **¿por qué el modelo asignó esta probabilidad a este cliente?**
+Un modelo que solo dice *"este cliente tiene 98% de probabilidad de default"* no es
+suficiente en banca. Un comité de riesgo, un auditor o un regulador va a preguntar
+**¿por qué?** SHAP (SHapley Additive exPlanations) permite responder exactamente eso:
+descompone la predicción de cada cliente en la contribución individual de cada variable.
 
-Cada variable recibe un valor SHAP que representa su contribución individual a la
-predicción — positivo si empuja hacia default, negativo si protege contra él.
+La lógica es simple: el modelo parte de una probabilidad base (el promedio del portafolio,
+~6.7%) y cada variable la empuja hacia arriba o hacia abajo. La suma de todas esas
+contribuciones explica por qué un cliente específico terminó con la probabilidad que tiene.
+
+- **SHAP positivo** → esa variable aumenta el riesgo de default
+- **SHAP negativo** → esa variable protege contra el default
 """)
 
-# Importancia global
-st.subheader("Importancia global de variables")
+st.markdown("---")
+
+# ---------------------------------------------------------------
+# IMPORTANCIA GLOBAL
+# ---------------------------------------------------------------
+st.subheader("¿Qué variables importan más para el modelo?")
+
+st.markdown("""
+La siguiente gráfica muestra el **SHAP medio absoluto** de cada variable — es decir,
+cuánto impacta en promedio sobre todos los clientes del conjunto de validación,
+sin importar la dirección. Las variables de arriba son las que el modelo usa más
+para tomar sus decisiones.
+""")
 
 fig_imp = px.bar(
     importancia.sort_values("SHAP_medio_absoluto"),
@@ -270,24 +287,37 @@ fig_imp.update_layout(height=450)
 st.plotly_chart(fig_imp, use_container_width=True)
 
 st.markdown("""
-`revolving_util` y `mora_acumulada` dominan el modelo con amplia ventaja.
-La edad (`age`) es el tercer factor más importante, con un efecto protector
-claro: a mayor edad, menor riesgo. El ingreso (`monthly_income_log`) tiene
-un impacto relativamente menor — el **comportamiento crediticio previo
-importa más que la capacidad declarada de pago**.
+`revolving_util` y `mora_acumulada` dominan el modelo con amplia ventaja — entre las
+dos explican la mayor parte de las decisiones. La edad (`age`) ocupa el tercer lugar
+con un efecto protector claro: a mayor edad, menor riesgo. Más abajo aparecen variables
+como `open_credit_lines` y `debt_ratio_log` con contribuciones moderadas.
+
+El hallazgo más relevante desde el punto de vista del negocio es que `monthly_income_log`
+aparece en la mitad inferior del ranking — **el comportamiento crediticio previo importa
+más que la capacidad declarada de pago**. Un cliente de altos ingresos con historial
+de mora sigue siendo un cliente de alto riesgo.
 """)
 
-# Análisis de 3 clientes
-st.subheader("Análisis individual: tres perfiles de cliente")
+st.markdown("---")
+
+# ---------------------------------------------------------------
+# ANÁLISIS INDIVIDUAL
+# ---------------------------------------------------------------
+st.subheader("¿Cómo decide el modelo para un cliente específico?")
 
 st.markdown("""
-Para ilustrar cómo el modelo toma decisiones, se analizan tres clientes
-representativos del conjunto de validación.
+Para ilustrar cómo opera el modelo en la práctica, se analizan tres perfiles del
+conjunto de validación: un cliente de alto riesgo, uno de bajo riesgo y un caso
+ambiguo donde las señales se contradicen.
+
+En cada caso, la gráfica de barras muestra la contribución SHAP de cada variable:
+**rojo** significa que esa variable empuja hacia default, **verde** que lo reduce.
+La magnitud de la barra indica qué tan fuerte es ese efecto.
 """)
 
 clientes_data = {
-    "Alto riesgo 🔴":  (shap_alto,   0.9865, "Sí"),
-    "Bajo riesgo 🟢":  (shap_bajo,   0.0076, "No"),
+    "Alto riesgo 🔴":  (shap_alto,    0.9865, "Sí"),
+    "Bajo riesgo 🟢":  (shap_bajo,    0.0076, "No"),
     "Caso ambiguo 🟡": (shap_ambiguo, 0.5000, "No"),
 }
 
@@ -302,7 +332,7 @@ for tab, (nombre, (df_shap, prob, default_real)) in zip(
         with col1:
             st.metric("P(default)", f"{prob:.2%}")
             st.metric("Default real", default_real)
-            st.markdown("**Valores del cliente**")
+            st.markdown("**Características del cliente**")
             st.dataframe(
                 df_shap[["Variable", "Valor"]].set_index("Variable"),
                 use_container_width=True
@@ -322,33 +352,37 @@ for tab, (nombre, (df_shap, prob, default_real)) in zip(
                 marker_color=df_plot["color"],
             ))
             fig_wf.update_layout(
-                title=f"Contribución SHAP por variable",
-                xaxis_title="SHAP value",
+                title="Contribución de cada variable a la predicción",
+                xaxis_title="SHAP value (rojo = aumenta riesgo, verde = reduce riesgo)",
                 height=420,
                 xaxis=dict(zeroline=True, zerolinewidth=2)
             )
             st.plotly_chart(fig_wf, use_container_width=True)
 
-# Descripciones por cliente
 descripciones = {
     "Alto riesgo 🔴": """
         Cliente de 33 años con utilización de crédito al límite (`revolving_util=1.07`)
-        y 9 eventos de mora acumulados. Estas dos variables explican casi toda la
-        predicción. El modelo asigna una probabilidad de default del **98.65%** —
-        un rechazo automático en cualquier política de originación estándar.
+        y 9 eventos de mora acumulados. Estas dos variables generan contribuciones SHAP
+        altamente positivas (+1.51 y +1.14 respectivamente) que dominan completamente
+        la predicción. El modelo asigna una probabilidad de default del **98.65%** —
+        un rechazo automático en cualquier política de originación estándar. El resto
+        de variables tienen un impacto marginal: nada puede compensar ese historial.
     """,
     "Bajo riesgo 🟢": """
         Cliente de 95 años, sin ningún evento de mora previo y utilización de crédito
-        prácticamente en cero. Todas las variables SHAP son negativas — cada una
-        contribuye a reducir el riesgo. Probabilidad de default: **0.76%**.
-        Perfil ideal para ofrecer productos de crédito con condiciones preferenciales.
+        prácticamente en cero. Todas las barras son verdes — cada variable contribuye
+        a reducir el riesgo. La edad (-1.14) y la utilización (-1.38) son los factores
+        más protectores. Probabilidad de default: **0.76%**. Perfil ideal para ofrecer
+        productos de crédito con condiciones preferenciales o tasas diferenciadas.
     """,
     "Caso ambiguo 🟡": """
-        El caso más interesante: `revolving_util=1.0` empuja fuertemente hacia default
-        (+0.88), pero la ausencia total de mora previa lo compensa (-0.52). Con solo
-        30 años y deuda alta pero sin historial de incumplimiento, el modelo no puede
-        decidir — probabilidad exactamente del **50%**. Este es el perfil que requiere
-        revisión manual o información adicional antes de aprobar.
+        El caso más interesante del análisis. `revolving_util=1.0` empuja fuertemente
+        hacia default (+0.88), pero la ausencia total de mora previa lo compensa
+        parcialmente (-0.52). Con solo 30 años y deuda alta pero sin historial de
+        incumplimiento, las señales se cancelan entre sí y el modelo no puede decidir
+        — probabilidad exactamente del **50%**. Este es precisamente el perfil que
+        requiere revisión manual o información adicional antes de tomar una decisión
+        de crédito: ni aprobación automática ni rechazo automático.
     """
 }
 
