@@ -431,10 +431,264 @@ for tab, nombre in zip([tab1, tab2, tab3], clientes_data.keys()):
 
 st.markdown("---")
 
+
+st.markdown("---")
+st.header("4. Simulador de riesgo crediticio")
+
+st.markdown("""
+Con base en el modelo entrenado, este simulador estima la probabilidad de default
+de un cliente a 2 años. Ingresa las características del cliente y el modelo explicará
+no solo el resultado, sino **qué variables lo determinan y en qué dirección**.
+""")
+
+import joblib
+import shap
+
+@st.cache_resource
+def cargar_modelo():
+    modelo = joblib.load(BASE / "xgb_model.pkl")
+    return modelo
+
+xgb_sim = cargar_modelo()
+explainer_sim = shap.TreeExplainer(xgb_sim)
+
+# ---------------------------------------------------------------
+# FORMULARIO DE ENTRADA
+# ---------------------------------------------------------------
+st.subheader("Características del cliente")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown("**Perfil básico**")
+    age = st.slider(
+        "Edad",
+        min_value=18, max_value=100, value=45,
+        help="Edad del cliente en años"
+    )
+    monthly_income = st.number_input(
+        "Ingreso mensual (USD)",
+        min_value=0, max_value=50000, value=5000, step=500,
+        help="Ingreso mensual declarado del cliente"
+    )
+    dependents = st.slider(
+        "Número de dependientes",
+        min_value=0, max_value=10, value=0,
+        help="Personas que dependen económicamente del cliente"
+    )
+
+with col2:
+    st.markdown("**Comportamiento crediticio**")
+    revolving_util = st.slider(
+        "Utilización de líneas rotativas (0 a 1)",
+        min_value=0.0, max_value=1.0, value=0.3, step=0.01,
+        help="Proporción del cupo disponible que está siendo usado. 1.0 = al límite"
+    )
+    late_30_59 = st.slider(
+        "Veces con mora 30-59 días",
+        min_value=0, max_value=10, value=0,
+        help="Número de veces que el cliente tuvo entre 30 y 59 días de retraso"
+    )
+    late_60_89 = st.slider(
+        "Veces con mora 60-89 días",
+        min_value=0, max_value=10, value=0,
+        help="Número de veces que el cliente tuvo entre 60 y 89 días de retraso"
+    )
+    late_90 = st.slider(
+        "Veces con mora 90+ días",
+        min_value=0, max_value=10, value=0,
+        help="Número de veces que el cliente tuvo 90 o más días de retraso"
+    )
+
+with col3:
+    st.markdown("**Estructura de deuda**")
+    debt_ratio = st.number_input(
+        "Debt Ratio",
+        min_value=0.0, max_value=2500.0, value=0.35, step=0.01,
+        help="Relación entre deudas totales e ingresos. Mayor a 1 indica que las deudas superan el ingreso"
+    )
+    open_credit_lines = st.slider(
+        "Líneas de crédito abiertas",
+        min_value=0, max_value=40, value=8,
+        help="Número total de tarjetas de crédito y préstamos activos"
+    )
+    real_estate_loans = st.slider(
+        "Préstamos hipotecarios",
+        min_value=0, max_value=10, value=1,
+        help="Número de préstamos de vivienda o bienes raíces activos"
+    )
+
+# ---------------------------------------------------------------
+# CÁLCULO INTERNO DE VARIABLES ENGINEERED
+# ---------------------------------------------------------------
+mora_acumulada = late_30_59 + late_60_89 + late_90
+tiene_mora_previa = 1 if mora_acumulada > 0 else 0
+ingreso_por_dependiente = monthly_income / (dependents + 1)
+
+# Aplicar los mismos cappings del entrenamiento
+debt_ratio_capped  = min(debt_ratio, 2449.0)
+income_capped      = min(monthly_income, 23000.0)
+ingreso_dep_capped = min(ingreso_por_dependiente, 23000.0)
+
+# Transformación log1p igual que en entrenamiento
+debt_ratio_log           = np.log1p(debt_ratio_capped)
+monthly_income_log       = np.log1p(income_capped)
+ingreso_por_dependiente_log = np.log1p(ingreso_dep_capped)
+
+# Vector de features en el mismo orden que FEATURES
+input_dict = {
+    "revolving_util":            revolving_util,
+    "age":                       age,
+    "late_30_59":                late_30_59,
+    "late_90":                   late_90,
+    "late_60_89":                late_60_89,
+    "open_credit_lines":         open_credit_lines,
+    "real_estate_loans":         real_estate_loans,
+    "dependents":                dependents,
+    "mora_acumulada":            mora_acumulada,
+    "tiene_mora_previa":         tiene_mora_previa,
+    "debt_ratio_log":            debt_ratio_log,
+    "monthly_income_log":        monthly_income_log,
+    "ingreso_por_dependiente_log": ingreso_por_dependiente_log
+}
+
+FEATURES = [
+    "revolving_util", "age", "late_30_59", "late_90", "late_60_89",
+    "open_credit_lines", "real_estate_loans", "dependents",
+    "mora_acumulada", "tiene_mora_previa",
+    "debt_ratio_log", "monthly_income_log", "ingreso_por_dependiente_log"
+]
+
+input_df = pd.DataFrame([input_dict])[FEATURES]
+
+# ---------------------------------------------------------------
+# PREDICCIÓN Y SHAP
+# ---------------------------------------------------------------
+if st.button("Calcular riesgo", type="primary", use_container_width=True):
+
+    prob = xgb_sim.predict_proba(input_df)[0][1]
+    shap_vals = explainer_sim(input_df)
+
+    # Nivel de riesgo
+    if prob < 0.10:
+        nivel    = "🟢 Riesgo Bajo"
+        color    = "#2ecc71"
+        mensaje  = "El perfil del cliente es consistente con un comportamiento de pago sólido. Candidato para aprobación automática."
+    elif prob < 0.30:
+        nivel    = "🟡 Riesgo Moderado"
+        color    = "#f39c12"
+        mensaje  = "El cliente presenta algunas señales de alerta. Se recomienda revisión adicional antes de aprobar."
+    elif prob < 0.60:
+        nivel    = "🟠 Riesgo Alto"
+        color    = "#e67e22"
+        mensaje  = "El perfil muestra señales claras de riesgo. Se recomienda solicitar garantías adicionales o ajustar condiciones."
+    else:
+        nivel    = "🔴 Riesgo Muy Alto"
+        color    = "#e74c3c"
+        mensaje  = "El modelo identifica una probabilidad de default muy alta. Perfil de rechazo bajo políticas estándar de originación."
+
+    # Resultado principal
+    st.markdown("---")
+    st.subheader("Resultado")
+
+    col_res1, col_res2 = st.columns([1, 2])
+
+    with col_res1:
+        st.markdown(
+            f"""
+            <div style="
+                border: 2px solid {color};
+                border-radius: 16px;
+                padding: 1.5rem;
+                text-align: center;
+                background: rgba(255,255,255,0.02)
+            ">
+                <div style="font-size: 2.5rem; font-weight: 800; color: {color}">
+                    {prob:.1%}
+                </div>
+                <div style="font-size: 1rem; color: #6b7280; margin-top: 0.3rem">
+                    Probabilidad de default
+                </div>
+                <div style="font-size: 1.1rem; font-weight: 600; margin-top: 0.8rem">
+                    {nivel}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        st.markdown("")
+        st.info(mensaje)
+
+    with col_res2:
+        # Gráfica SHAP del cliente
+        nombres_legibles = {
+            "revolving_util":               "Utilización de crédito rotativo",
+            "age":                          "Edad",
+            "late_30_59":                   "Mora 30-59 días",
+            "late_90":                      "Mora 90+ días",
+            "late_60_89":                   "Mora 60-89 días",
+            "open_credit_lines":            "Líneas de crédito abiertas",
+            "real_estate_loans":            "Préstamos hipotecarios",
+            "dependents":                   "Dependientes",
+            "mora_acumulada":               "Mora acumulada histórica",
+            "tiene_mora_previa":            "Tiene mora previa",
+            "debt_ratio_log":               "Ratio de deuda",
+            "monthly_income_log":           "Ingreso mensual",
+            "ingreso_por_dependiente_log":  "Ingreso por dependiente"
+        }
+
+        shap_df = pd.DataFrame({
+            "Variable": [nombres_legibles[f] for f in FEATURES],
+            "SHAP":     shap_vals.values[0]
+        }).sort_values("SHAP")
+
+        shap_df["color"] = shap_df["SHAP"].apply(
+            lambda x: "#e74c3c" if x > 0 else "#2ecc71"
+        )
+
+        fig_sim = go.Figure(go.Bar(
+            x=shap_df["SHAP"],
+            y=shap_df["Variable"],
+            orientation="h",
+            marker_color=shap_df["color"]
+        ))
+        fig_sim.update_layout(
+            title="¿Por qué este resultado? — Contribución de cada variable",
+            xaxis_title="Impacto (rojo = aumenta riesgo, verde = reduce riesgo)",
+            height=450,
+            xaxis=dict(zeroline=True, zerolinewidth=2)
+        )
+        st.plotly_chart(fig_sim, use_container_width=True)
+
+    # Explicación en lenguaje natural
+    st.subheader("Explicación del resultado")
+
+    top_riesgo   = shap_df[shap_df["SHAP"] > 0].sort_values("SHAP", ascending=False).head(3)
+    top_protecc  = shap_df[shap_df["SHAP"] < 0].sort_values("SHAP").head(3)
+
+    col_r, col_p = st.columns(2)
+
+    with col_r:
+        st.markdown("**🔴 Principales factores de riesgo**")
+        if len(top_riesgo) == 0:
+            st.write("Ninguna variable aumenta significativamente el riesgo.")
+        else:
+            for _, row in top_riesgo.iterrows():
+                st.markdown(f"- **{row['Variable']}** — impacto: `+{row['SHAP']:.3f}`")
+
+    with col_p:
+        st.markdown("**🟢 Principales factores protectores**")
+        if len(top_protecc) == 0:
+            st.write("Ninguna variable reduce significativamente el riesgo.")
+        else:
+            for _, row in top_protecc.iterrows():
+                st.markdown(f"- **{row['Variable']}** — impacto: `{row['SHAP']:.3f}`")
+
+
 # ===============================================================
 # 5. CONCLUSIONES
 # ===============================================================
-st.header("4. Conclusiones")
+st.header("5. Conclusiones")
 
 st.markdown("""
 **Problema:** predecir la probabilidad de default crediticio a 2 años sobre
@@ -464,3 +718,5 @@ captura el patrón principal.
 crediticio puede haber cambiado. En producción, el modelo requeriría
 reentrenamiento periódico con datos recientes.
 """)
+
+
