@@ -269,10 +269,50 @@ st.markdown("---")
 st.subheader("¿Qué variables importan más para el modelo?")
 
 st.markdown("""
-La siguiente gráfica muestra el **SHAP medio absoluto** de cada variable — es decir,
-cuánto impacta en promedio sobre todos los clientes del conjunto de validación,
-sin importar la dirección. Las variables de arriba son las que el modelo usa más
-para tomar sus decisiones.
+La siguiente gráfica muestra el comportamiento de los SHAP values para todos los
+clientes del conjunto de validación simultáneamente. Cada punto representa un cliente.
+
+**Cómo leerla:**
+- **Eje Y:** variables ordenadas de mayor a menor importancia
+- **Eje X:** valor SHAP — qué tanto empuja esa variable hacia default (derecha)
+  o hacia solvencia (izquierda)
+- **Color rojo:** el cliente tiene un valor **alto** en esa variable
+- **Color azul:** el cliente tiene un valor **bajo** en esa variable
+
+Por ejemplo, en `revolving_util`: los puntos rojos están a la derecha — utilización
+alta aumenta el riesgo. Los azules están a la izquierda — utilización baja lo reduce.
+En `age` ocurre lo contrario: los puntos rojos (clientes mayores) están a la izquierda,
+lo que confirma que la edad avanzada **protege** contra el default.
+""")
+
+from PIL import Image
+st.image(
+    Image.open(BASE / "shap_summary_plot.png"),
+    caption="Cada punto es un cliente del conjunto de validación. Rojo = valor alto de la variable, Azul = valor bajo. La posición horizontal indica el impacto sobre el riesgo.",
+    use_container_width=True
+)
+
+st.markdown("""
+La gráfica revela tres patrones claros:
+
+- **`revolving_util`** tiene la distribución más amplia — clientes con utilización
+  alta (rojo) se concentran a la derecha con impactos de hasta +2, mientras los de
+  utilización baja (azul) se ubican a la izquierda. Es la variable más determinante.
+
+- **`mora_acumulada`** muestra un patrón asimétrico: la mayoría de puntos están
+  cerca de cero (clientes sin mora previa), pero los pocos con mora acumulada alta
+  (rojo) generan impactos muy grandes hacia la derecha — son los casos de mayor riesgo.
+
+- **`age`** es la única variable donde el rojo está a la izquierda — mayor edad
+  reduce el riesgo. Su efecto es consistente y lineal a lo largo de toda la distribución.
+""")
+
+st.markdown("#### Ranking de importancia por variable")
+
+st.markdown("""
+La siguiente gráfica resume la importancia global de cada variable como el promedio
+del valor absoluto de sus SHAP values — es decir, cuánto impacta en promedio sobre
+todos los clientes, sin importar la dirección.
 """)
 
 fig_imp = px.bar(
@@ -287,10 +327,8 @@ fig_imp.update_layout(height=450)
 st.plotly_chart(fig_imp, use_container_width=True)
 
 st.markdown("""
-`revolving_util` y `mora_acumulada` dominan el modelo con amplia ventaja — entre las
-dos explican la mayor parte de las decisiones. La edad (`age`) ocupa el tercer lugar
-con un efecto protector claro: a mayor edad, menor riesgo. Más abajo aparecen variables
-como `open_credit_lines` y `debt_ratio_log` con contribuciones moderadas.
+`revolving_util` y `mora_acumulada` dominan el modelo con amplia ventaja.
+La edad (`age`) ocupa el tercer lugar con un efecto protector claro.
 
 El hallazgo más relevante desde el punto de vista del negocio es que `monthly_income_log`
 aparece en la mitad inferior del ranking — **el comportamiento crediticio previo importa
