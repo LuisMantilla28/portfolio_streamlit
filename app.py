@@ -138,7 +138,7 @@ with col1:
     with cta3:
         st.link_button("Modelado financiero", "https://portfolioluismantilla.streamlit.app/modelado_financiero", use_container_width=True)
     with cta4:
-        st.link_button("Machine Learning", "https://portfolioluismantilla.streamlit.app/ml", use_container_width=True)
+        st.link_button("Machine Learning", "https://portfolioluismantilla.streamlit.app/ML", use_container_width=True)
 
 with col2:
     st.markdown("### Perfil")
@@ -232,7 +232,7 @@ with p4:
         "Predicción de Default con XGBoost y SHAP",
         "Modelo de scoring crediticio sobre 150,000 clientes para predecir mora grave a 2 años. Pipeline completo de preprocesamiento, modelación comparativa e interpretabilidad con SHAP values.",
         ["XGBoost", "SHAP", "Scoring crediticio", "Clasificación", "Desbalance de clases"],
-        "https://portfolioluismantilla.streamlit.app/ml"
+        "https://portfolioluismantilla.streamlit.app/ML"
     )
 
 with p5:
