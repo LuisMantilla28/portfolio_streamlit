@@ -1,0 +1,14 @@
+Variable,SHAP,Valor
+revolving_util,-1.3792,0.0061
+age,-1.1389,95.0
+mora_acumulada,-0.6392,0.0
+open_credit_lines,-0.5957,2.0
+debt_ratio_log,-0.3874,0.0003
+ingreso_por_dependiente_log,-0.2777,8.2266
+monthly_income_log,-0.176,8.2266
+tiene_mora_previa,-0.1675,0.0
+late_90,-0.0731,0.0
+late_60_89,-0.0341,0.0
+real_estate_loans,-0.029,0.0
+late_30_59,0.0128,0.0
+dependents,-0.0007,0.0

@@ -1,0 +1,7 @@
+Problema,Estrategia,Justificación
+Valores centinela (96/98) en variables de mora,Reemplazo por NaN → imputación con 0,Códigos sin significado financiero real
+age = 0,Eliminación del registro,"Edad imposible, registro corrupto"
+"revolving_util extremo (max ~50,708)",Capping en percentil 99,Sin interpretación financiera válida
+"debt_ratio extremo (max ~329,664)",Capping en percentil 99,Sin interpretación financiera válida
+monthly_income nulos (~20%),Imputación por mediana segmentada (open_credit_lines),El nivel de crédito activo es proxy del ingreso
+dependents nulos (~2.6%),Imputación por mediana global,"Variable secundaria, mediana=0 es representativa"

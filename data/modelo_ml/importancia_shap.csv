@@ -1,0 +1,14 @@
+Variable,SHAP_medio_absoluto
+revolving_util,0.7936
+mora_acumulada,0.584
+age,0.238
+open_credit_lines,0.1831
+tiene_mora_previa,0.1628
+debt_ratio_log,0.1447
+real_estate_loans,0.1161
+late_90,0.101
+monthly_income_log,0.0923
+ingreso_por_dependiente_log,0.0619
+late_60_89,0.0432
+late_30_59,0.0208
+dependents,0.0089
