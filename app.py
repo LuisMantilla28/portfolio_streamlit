@@ -230,8 +230,7 @@ with p4:
     project_card(
         "Machine Learning · Riesgo Crediticio",
         "Predicción de Default con XGBoost y SHAP",
-        "Modelo de scoring crediticio sobre 150,000 clientes para predecir mora grave a 2 años. Pipeline completo de preprocesamiento, modelación comparativa e interpretabilidad con SHAP values.",
-        ["XGBoost", "SHAP", "Scoring crediticio", "Clasificación", "Desbalance de clases"],
+        "Modelo de scoring crediticio sobre 150,000 clientes para predecir mora grave a 2 años. Pipeline completo de preprocesamiento, modelación comparativa e interpretabilidad con SHAP values. Incluye un simulador interactivo para estimar el riesgo de un cliente y explicar el resultado variable por variable.",        ["XGBoost", "SHAP", "Scoring crediticio", "Clasificación", "Desbalance de clases"],
         "https://portfolioluismantilla.streamlit.app/ML"
     )
 
