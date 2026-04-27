@@ -97,7 +97,7 @@ st.header("2. Modelación")
 
 st.markdown("""
 Se compararon dos modelos con una lógica de complejidad creciente. Ambos incorporan
-una estrategia explícita para el desbalance de clases, dado que los defaults representan
+una estrategia explícita para el desbalance de clases, dado que los defaults ( dejó de pagar su deuda por 90 días o más) representan
 solo el 6.7% de la muestra.
 """)
 
