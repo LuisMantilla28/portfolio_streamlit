@@ -289,7 +289,7 @@ from PIL import Image
 st.image(
     Image.open(BASE / "shap_summary_plot.png"),
     caption="Cada punto es un cliente del conjunto de validación. Rojo = valor alto de la variable, Azul = valor bajo. La posición horizontal indica el impacto sobre el riesgo.",
-    use_container_width=True
+    width=600
 )
 
 st.markdown("""
