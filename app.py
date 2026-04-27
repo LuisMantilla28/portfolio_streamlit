@@ -23,24 +23,18 @@ st.markdown("""
         line-height: 1.0;
         margin-bottom: 0.2rem;
     }
-
     .hero-subtitle {
         font-size: 1.15rem;
         color: #6b7280;
         margin-bottom: 1rem;
     }
-
     .section-title {
         font-size: 1.55rem;
         font-weight: 750;
         margin-top: 0.5rem;
         margin-bottom: 0.8rem;
     }
-
-    .muted {
-        color: #6b7280;
-    }
-
+    .muted { color: #6b7280; }
     .card {
         border: 1px solid rgba(120,120,120,0.18);
         border-radius: 18px;
@@ -48,7 +42,6 @@ st.markdown("""
         background: rgba(255,255,255,0.02);
         height: 100%;
     }
-
     .eyebrow {
         font-size: 0.78rem;
         font-weight: 700;
@@ -57,13 +50,11 @@ st.markdown("""
         color: #6b7280;
         margin-bottom: 0.35rem;
     }
-
     .card h3 {
         margin-top: 0.15rem;
         margin-bottom: 0.45rem;
         font-size: 1.12rem;
     }
-
     .badge {
         display: inline-block;
         padding: 0.35rem 0.7rem;
@@ -73,7 +64,6 @@ st.markdown("""
         background: rgba(120,120,120,0.08);
         font-size: 0.84rem;
     }
-
     .metric-card {
         border: 1px solid rgba(120,120,120,0.18);
         border-radius: 16px;
@@ -81,18 +71,15 @@ st.markdown("""
         text-align: center;
         background: rgba(255,255,255,0.02);
     }
-
     .metric-value {
         font-size: 1.45rem;
         font-weight: 800;
         margin-bottom: 0.15rem;
     }
-
     .metric-label {
         font-size: 0.92rem;
         color: #6b7280;
     }
-
     .footer-note {
         text-align: center;
         color: #6b7280;
@@ -101,7 +88,6 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
 
 # ---------------------------------------------------
 # HELPERS
@@ -138,18 +124,21 @@ with col1:
     )
 
     st.write("""
-   Matemático y candidato a Magíster en Estadística, con interés en la intersección entre datos, riesgo y finanzas 
-   cuantitativas. Desarrollo proyectos aplicados en analítica bancaria, series de tiempo, modelado financiero y aprendizaje estadístico. 
-   Actualmente, mi tesis se enfoca en valoración de opciones y modelado financiero.
+    Matemático y candidato a Magíster en Estadística, con interés en la intersección entre datos,
+    riesgo y finanzas cuantitativas. Desarrollo proyectos aplicados en analítica bancaria,
+    series de tiempo, modelado financiero, machine learning y aprendizaje estadístico.
+    Actualmente, mi tesis se enfoca en valoración de opciones y modelado financiero.
     """)
 
-    cta1, cta2, cta3 = st.columns(3)
+    cta1, cta2, cta3, cta4 = st.columns(4)
     with cta1:
-        st.link_button("Proyecto SQL", "https://portfolioluismantilla.streamlit.app/SQL", use_container_width=True)
+        st.link_button("SQL", "https://portfolioluismantilla.streamlit.app/SQL", use_container_width=True)
     with cta2:
         st.link_button("Series de tiempo", "https://portfolioluismantilla.streamlit.app/series_tiempo", use_container_width=True)
     with cta3:
         st.link_button("Modelado financiero", "https://portfolioluismantilla.streamlit.app/modelado_financiero", use_container_width=True)
+    with cta4:
+        st.link_button("Machine Learning", "https://portfolioluismantilla.streamlit.app/ml", use_container_width=True)
 
 with col2:
     st.markdown("### Perfil")
@@ -195,8 +184,6 @@ with m3:
     </div>
     """, unsafe_allow_html=True)
 
-
-
 st.markdown("---")
 
 # ---------------------------------------------------
@@ -204,7 +191,7 @@ st.markdown("---")
 # ---------------------------------------------------
 st.markdown("<div class='section-title'>🚀 Proyectos destacados</div>", unsafe_allow_html=True)
 st.markdown(
-    "<div class='muted'>Cada proyecto muestra una faceta distinta de mi perfil: negocio, modelación, simulación y análisis estadístico.</div>",
+    "<div class='muted'>Cada proyecto muestra una faceta distinta de mi perfil: negocio, modelación, simulación y machine learning.</div>",
     unsafe_allow_html=True
 )
 
@@ -240,11 +227,11 @@ with p3:
 
 with p4:
     project_card(
-        "Statistics · Unsupervised Learning",
-        "Aprendizaje no Supervisado y Análisis Multivariado",
-        "Proyecto en Quarto orientado a exploración estructural de datos, reducción de dimensionalidad y lectura estadística de patrones multivariados.",
-        ["Análisis multivariado", "Unsupervised learning", "Quarto", "EDA", "Visualización", "R"],
-        "https://luis-mantilla.quarto.pub/aa_cd/Analisis_Multivariado.html#an%C3%A1lisis-sobre-las-variables"
+        "Machine Learning · Riesgo Crediticio",
+        "Predicción de Default con XGBoost y SHAP",
+        "Modelo de scoring crediticio sobre 150,000 clientes para predecir mora grave a 2 años. Pipeline completo de preprocesamiento, modelación comparativa e interpretabilidad con SHAP values.",
+        ["XGBoost", "SHAP", "Scoring crediticio", "Clasificación", "Desbalance de clases"],
+        "https://portfolioluismantilla.streamlit.app/ml"
     )
 
 st.markdown("---")
@@ -257,7 +244,7 @@ st.markdown("<div class='section-title'>🏆 Logro destacado</div>", unsafe_allo
 l1, l2 = st.columns([1.2, 1], gap="large")
 
 with l1:
-   st.markdown("""
+    st.markdown("""
 <div class="card">
     <div class="eyebrow">Validación externa</div>
     <h3>1.er lugar — Competencia de Casos CAS + ACTEX 2025</h3>
@@ -311,7 +298,7 @@ with s2:
     st.markdown("**Qué encontrarás aquí**")
     st.write("• proyectos navegables")
     st.write("• análisis reproducible")
-    st.write("• modelación estadística")
+    st.write("• modelación estadística y machine learning")
     st.write("• aplicaciones en banca, riesgo y finanzas")
 
 st.markdown("---")
@@ -325,7 +312,7 @@ a1, a2, a3 = st.columns(3)
 
 with a1:
     st.markdown("**Banca y riesgo**")
-    st.write("- cartera\n- mora\n- NII / EaR\n- factores de riesgo")
+    st.write("- cartera\n- mora\n- NII / EaR\n- scoring crediticio")
 
 with a2:
     st.markdown("**Estadística y modelación**")
@@ -333,7 +320,7 @@ with a2:
 
 with a3:
     st.markdown("**Data science**")
-    st.write("- SQL analytics\n- series de tiempo\n- visualización\n- aprendizaje no supervisado")
+    st.write("- SQL analytics\n- series de tiempo\n- machine learning\n- interpretabilidad (SHAP)")
 
 st.markdown("---")
 
@@ -354,7 +341,7 @@ with c2:
 
 with c3:
     st.markdown("**Modelación**")
-    st.markdown(badges(["VAR", "Bootstrap", "Inferencia", "Multivariado"]), unsafe_allow_html=True)
+    st.markdown(badges(["XGBoost", "VAR", "Bootstrap", "SHAP"]), unsafe_allow_html=True)
 
 with c4:
     st.markdown("**Visualización / Deploy**")
