@@ -35,7 +35,7 @@ def show():
             st.switch_page("pages/modelado_financiero.py")
             
         if st.button("🤖 Machine Learning"):
-            st.switch_page("pages/ML.pyy")
+            st.switch_page("pages/ML.py")
 
         st.markdown("---")
         st.markdown("### Enlaces")
